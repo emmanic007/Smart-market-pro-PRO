@@ -1,7 +1,8 @@
 /* Smart Market Pro — Service Worker (version PRO)
    Si tu ajoutes ou renommes un fichier JS/CSS, mets-le dans APP_SHELL
    ET change CACHE_VERSION pour forcer la mise à jour chez les utilisateurs. */
-const CACHE_VERSION = 'smp-pro-v1';
+const CACHE_VERSION = 'smp-pro-v2';
+const CDN_HOSTS = ['cdn.jsdelivr.net'];            // Chart.js, SheetJS : mémorisés pour le hors ligne
 const APP_SHELL = [
   './',
   './index.html',
@@ -71,7 +72,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  if (url.origin !== location.origin) return;           // CDN, Google Fonts, Supabase : réseau direct
+  if (CDN_HOSTS.includes(url.hostname)) {                // librairies : réseau d'abord, sinon copie mémorisée
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_VERSION).then(c => c.put(e.request, copy));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  if (url.origin !== location.origin) return;           // Google Fonts, Supabase : réseau direct
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       const copy = res.clone();
