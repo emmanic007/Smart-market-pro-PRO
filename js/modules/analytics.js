@@ -100,7 +100,7 @@ const Analytics = {
   },
   _renderChart(period) {
     const canvas = document.getElementById('mainChart'); if(!canvas) return;
-    if (typeof Chart === 'undefined') {
+    if (typeof Chart === 'undefined' || !Chart) {
       canvas.parentElement.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--fm);font-size:.8rem">Graphique indisponible — connexion internet requise</div>';
       return;
     }
