@@ -62,12 +62,26 @@ const Sync = {
     this.META.forEach(k => { if (DB.data[k] !== undefined) out['meta:' + k] = { kind: 'meta', id: k, data: { v: DB.data[k] } }; });
     return out;
   },
-  pendingCount() {
-    const snap = this._snapshot(), h = this.store ? this.store.h : {}; let n = 0;
-    for (const k in snap) if (h[k] !== this._h(this._canon(snap[k].data))) n++;
-    for (const k in h) if (!(k in snap) && k.indexOf('meta:') !== 0) n++;
-    return n;
+  _canPush(kind, id) {   // le vendeur n'écrit que produits, ses ventes et la fidélité (le serveur le vérifie aussi)
+    const r = CloudAuth.ctx && CloudAuth.ctx.role;
+    return r !== 'seller' || kind === 'items' || kind === 'sales' || (kind === 'meta' && id === 'loyalty');
   },
+  _diff() {
+    const snap = this._snapshot(), h = this.store.h, rej = this.store.rej || (this.store.rej = {}), up = [], dels = [];
+    const seller = CloudAuth.ctx && CloudAuth.ctx.role === 'seller';
+    for (const k in snap) {
+      const e = snap[k];
+      if (!this._canPush(e.kind, e.id)) continue;
+      const hh = this._h(this._canon(e.data));
+      if (h[k] !== hh && rej[k] !== hh) up.push({ k, hh, row: { shop_id: this.shop, kind: e.kind, id: e.id, data: e.data, deleted: false } });
+    }
+    if (!seller) for (const k in h) if (!(k in snap) && k.indexOf('meta:') !== 0 && rej[k] !== 'del') {
+      const p = k.indexOf(':');
+      dels.push({ k, del: true, row: { shop_id: this.shop, kind: k.slice(0, p), id: k.slice(p + 1), data: {}, deleted: true } });
+    }
+    return { up, dels };
+  },
+  pendingCount() { if (!this.store) return 0; const d = this._diff(); return d.up.length + d.dels.length; },
 
   /* ---------- Cycle de synchronisation ---------- */
   async now() {
@@ -82,6 +96,7 @@ const Sync = {
       this._save();
       this._set(this._blocked ? 'blocked' : 'idle');
       if (changed) this._refreshUI();
+      if (!this._teamDone && (typeof CloudTeam !== 'undefined') && CloudAuth.ctx && CloudAuth.ctx.role !== 'seller') { this._teamDone = true; CloudTeam.fetch().catch(() => {}); }
     } catch (e) { this._onErr(e); }
     this._running = false;
     if (this._again) { this._again = false; this.schedule(1500); }
@@ -152,27 +167,35 @@ const Sync = {
   },
 
   /* ---------- Envoi ---------- */
+  async _upsertRows(part) {     // renvoie les lignes refusées par le serveur (droits), sans bloquer les autres
+    const { error } = await this.c.from('records').upsert(part.map(x => x.row), { onConflict: 'shop_id,kind,id' });
+    if (!error) return [];
+    if (error.code === '42501') {
+      await this._fetchSub();
+      if (this._blocked) throw error;                       // abonnement expiré : on arrête tout
+      if (part.length === 1) return part;
+      let rej = [];
+      for (const x of part) rej = rej.concat(await this._upsertRows([x]));
+      return rej;
+    }
+    throw error;
+  },
   async _push() {
-    const snap = this._snapshot(), h = this.store.h, up = [], dels = [];
-    for (const k in snap) {
-      const e = snap[k], hh = this._h(this._canon(e.data));
-      if (h[k] !== hh) up.push({ k, hh, row: { shop_id: this.shop, kind: e.kind, id: e.id, data: e.data, deleted: false } });
-    }
-    for (const k in h) if (!(k in snap) && k.indexOf('meta:') !== 0) {
-      const p = k.indexOf(':');
-      dels.push({ k, row: { shop_id: this.shop, kind: k.slice(0, p), id: k.slice(p + 1), data: {}, deleted: true } });
-    }
+    const h = this.store.h, rejStore = this.store.rej || (this.store.rej = {});
+    const { up, dels } = this._diff();
     if (dels.length > 20 && dels.length > Object.keys(h).length * 0.5) {   // garde-fou : disparition massive
       if (!confirm(dels.length + ' éléments ont disparu de cet appareil.\nLes supprimer aussi du cloud ?\n\nOK = supprimer partout\nAnnuler = les récupérer depuis le cloud')) {
         dels.forEach(d => delete h[d.k]); this.store.pull = null; dels.length = 0; this.schedule(500);
       }
     }
-    const rows = up.concat(dels.map(d => ({ k: d.k, del: true, row: d.row })));
+    const rows = up.concat(dels);
     for (let i = 0; i < rows.length; i += 200) {
       const part = rows.slice(i, i + 200);
-      const { error } = await this.c.from('records').upsert(part.map(x => x.row), { onConflict: 'shop_id,kind,id' });
-      if (error) throw error;
-      part.forEach(x => { if (x.del) delete h[x.k]; else h[x.k] = x.hh; });
+      const refused = new Set((await this._upsertRows(part)).map(x => x.k));
+      part.forEach(x => {
+        if (refused.has(x.k)) rejStore[x.k] = x.del ? 'del' : x.hh;
+        else { delete rejStore[x.k]; if (x.del) delete h[x.k]; else h[x.k] = x.hh; }
+      });
       this._save();
     }
   },
@@ -193,7 +216,9 @@ const Sync = {
     if (st === 'syncing') { t = 'Synchronisation…'; spin = true; }
     else if (st === 'idle') {
       t = '☁ Synchronisé';
-      if (this.sub && this.sub.status === 'trialing') t += ' · essai ' + Math.max(0, Math.ceil((new Date(this.sub.trial_ends_at) - Date.now()) / 864e5)) + ' j';
+      const nr = Object.keys((this.store && this.store.rej) || {}).length;
+      if (nr) t = '⚠ ' + nr + ' modification(s) refusée(s) : droits insuffisants';
+      else if (this.sub && this.sub.status === 'trialing') t += ' · essai ' + Math.max(0, Math.ceil((new Date(this.sub.trial_ends_at) - Date.now()) / 864e5)) + ' j';
     }
     else if (st === 'offline') { const n = this.pendingCount(); t = '⏸ Hors ligne' + (n ? ' · ' + n + ' en attente' : ''); }
     else if (st === 'blocked') t = '⚠ Abonnement expiré — données gardées sur l\'appareil';
@@ -205,6 +230,6 @@ const Sync = {
     el.style.display = 'flex';
     if (st === 'auth') el.onclick = () => CloudAuth.signOut();
     else el.onclick = () => this.now();
-    if (st === 'idle') this._hideT = setTimeout(() => { el.style.display = 'none'; }, 3500);
+    if (st === 'idle' && t.indexOf('⚠') !== 0) this._hideT = setTimeout(() => { el.style.display = 'none'; }, 3500);
   }
 };

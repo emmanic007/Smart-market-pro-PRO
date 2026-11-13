@@ -96,6 +96,7 @@ const CloudAuth = {
     this._busy(false);
   },
   async _afterAuth() {
+    try { await this.client.rpc('accept_invitations'); } catch (e) {}   // une invitation attend cet email ?
     const r = await this._loadShop();
     if (r === false) return this._show('shop');
     if (r === null) return this._show('login', 'Impossible de charger votre boutique. Réessayez.');
@@ -105,12 +106,12 @@ const CloudAuth = {
     try {
       // Une seule boutique pour l'instant (le multi-boutiques viendra plus tard)
       const { data, error } = await this.client.from('shop_members')
-        .select('role, shop_id, shops(id, name, currency)').eq('user_id', this.user.id).limit(1);
+        .select('role, display_name, shop_id, shops(id, name, currency)').eq('user_id', this.user.id).limit(1);
       if (error) throw error;
       if (!data || !data.length) return false;
       const m = data[0], sh = m.shops || {};
       this._saveCtx({ userId: this.user.id, email: this.user.email, shopId: m.shop_id,
-        shopName: sh.name || '', currency: sh.currency || 'F', role: m.role });
+        shopName: sh.name || '', currency: sh.currency || 'F', role: m.role, displayName: m.display_name || '' });
       return true;
     } catch (e) {
       console.warn('[Cloud] loadShop', e);
@@ -137,16 +138,36 @@ const CloudAuth = {
     this._hide();
     this._badge();
     if (this.ctx && this.ctx.shopId) this._initClient().then(ok => { if (ok) Sync.start(); });
+    if (this.isSeller()) { this._sellerHook(); this._sellerLogin(); return; }   // vendeur cloud : pas de PIN
+    if ((typeof CloudTeam !== 'undefined')) CloudTeam.init();
     Auth.ensureDefaultAdmin().then(() => {
       Auth.renderAccountsList();
       const ov = document.getElementById('auth-overlay');
       if (ov) ov.style.display = 'flex';
     });
   },
-  async signOut() {
-    if (navigator.onLine && window.Sync && Sync.ready()) { try { await Sync.now(); } catch (e) {} }
-    const n = window.Sync && Sync.ready() ? Sync.pendingCount() : 0;
-    if (!confirm('Se déconnecter du compte cloud ?\n' + (n ? n + ' modification(s) pas encore envoyée(s) restent sur cet appareil.\n' : '') + 'Les données restent sur cet appareil.')) return;
+  /* ---------- Vendeur cloud : son compte remplace le PIN ---------- */
+  isSeller() { return !!(this.ctx && this.ctx.role === 'seller'); },
+  _sellerLogin() {
+    const ov = document.getElementById('auth-overlay'); if (ov) ov.style.display = 'none';
+    const name = this.ctx.displayName || String(this.ctx.email || 'Vendeur').split('@')[0];
+    Auth._enterSession({ id: 'cloud_' + this.ctx.userId, name, role: 'seller', cloud: true });
+  },
+  _sellerHook() {      // « Quitter » = se déconnecter du compte (jamais d'accès aux comptes PIN de l'appareil)
+    if (this._sellerHooked) return;
+    this._sellerHooked = true;
+    const o = Auth.logout.bind(Auth);
+    Auth.logout = () => {
+      o();
+      const ov = document.getElementById('auth-overlay'); if (ov) ov.style.display = 'none';
+      if (confirm('Se déconnecter du compte ?\nOK = se déconnecter\nAnnuler = rester connecté')) this.signOut(true);
+      else this._sellerLogin();
+    };
+  },
+  async signOut(skipConfirm) {
+    if (navigator.onLine && (typeof Sync !== 'undefined') && Sync.ready()) { try { await Sync.now(); } catch (e) {} }
+    const n = (typeof Sync !== 'undefined') && Sync.ready() ? Sync.pendingCount() : 0;
+    if (!skipConfirm && !confirm('Se déconnecter du compte cloud ?\n' + (n ? n + ' modification(s) pas encore envoyée(s) restent sur cet appareil.\n' : '') + 'Les données restent sur cet appareil.')) return;
     try { if (this.client) await this.client.auth.signOut({ scope: 'local' }); } catch (e) {}
     try { localStorage.removeItem(this.CTX_KEY); } catch (e) {}
     location.reload();

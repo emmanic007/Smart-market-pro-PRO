@@ -18,6 +18,34 @@ const Auth = {
       if (d) d.classList.toggle('filled', i < this._buf.length);
     }
   },
+  /* Ouvre la session d'un utilisateur (PIN local ou vendeur cloud) */
+  _enterSession(found) {
+    this.currentUser = found;
+    const ov = document.getElementById('auth-overlay');
+    if (ov) ov.style.display = 'none';
+    if (found.role === 'admin') {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
+    } else {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
+    }
+    const navU = document.getElementById('nav-username'); if(navU) navU.textContent = found.name;
+    const mobU = document.getElementById('mob-username'); if(mobU) mobU.textContent = found.name;
+    UI.renderAll(); Dashboard.refresh();
+    UI.toast(`${I18n.t('toast_welcome_back')}, ${found.name} 👋`, 'success');
+    if (found.role === 'admin' && typeof EODSummary !== 'undefined') EODSummary.schedule();
+    if (found.role !== 'admin') {
+      setTimeout(() => {
+        if (typeof SellerDash !== 'undefined') SellerDash.show();
+        else if (typeof SellerMode !== 'undefined') {
+          const _sn = document.getElementById('sm-shop-name');
+          const _sl = document.getElementById('sm-seller-name');
+          if (_sn) _sn.textContent = Settings.data.shopName || 'Smart Market Pro';
+          if (_sl) _sl.textContent = found.name;
+          SellerMode.activate();
+        }
+      }, 300);
+    }
+  },
   async _tryLogin() {
     const pin = this._buf; this._buf = ''; this._dots();
     if (!pin || pin.length !== 4) return;
@@ -45,31 +73,7 @@ const Auth = {
       try { localStorage.setItem('SMP_PIN_LOCK', JSON.stringify({a:0,u:0})); } catch(_) {}
       try { localStorage.setItem('SMP_LAST_USER', found.id); } catch(_) {}
       // Entrer dans l'app directement
-      this.currentUser = found;
-      const ov = document.getElementById('auth-overlay');
-      if (ov) ov.style.display = 'none';
-      if (found.role === 'admin') {
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
-      } else {
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
-      }
-      const navU = document.getElementById('nav-username'); if(navU) navU.textContent = found.name;
-      const mobU = document.getElementById('mob-username'); if(mobU) mobU.textContent = found.name;
-      UI.renderAll(); Dashboard.refresh();
-      UI.toast(`${I18n.t('toast_welcome_back')}, ${found.name} 👋`, 'success');
-      if (found.role === 'admin' && typeof EODSummary !== 'undefined') EODSummary.schedule();
-      if (found.role !== 'admin') {
-        setTimeout(() => {
-          if (typeof SellerDash !== 'undefined') SellerDash.show();
-          else if (typeof SellerMode !== 'undefined') {
-            const _sn = document.getElementById('sm-shop-name');
-            const _sl = document.getElementById('sm-seller-name');
-            if (_sn) _sn.textContent = Settings.data.shopName || 'Smart Market Pro';
-            if (_sl) _sl.textContent = found.name;
-            SellerMode.activate();
-          }
-        }, 300);
-      }
+      this._enterSession(found);
     } else {
       try {
         const ld = JSON.parse(localStorage.getItem('SMP_PIN_LOCK') || '{"a":0,"u":0}');
@@ -98,7 +102,7 @@ const Auth = {
     const stepPin   = document.getElementById('auth-step-pin');
     if (stepLocal) stepLocal.style.display = 'block';
     if (stepPin)   stepPin.style.display   = 'none';
-    const users = DB.data.users || [];
+    const users = (DB.data.users || []).filter(u => !u.cloud);
 
     if (!users.length) {
       // Ne devrait jamais arriver après ensureDefaultAdmin — cas de sécurité

@@ -12,3 +12,14 @@
 .cloud-msg.ok{color:var(--accent);}
 #cloud-badge{margin-top:16px;text-align:center;font-family:var(--fm);font-size:.66rem;color:var(--text3);}
 #cloud-badge a{color:var(--text2);}
+#cloud-team{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--rmd);padding:16px;margin-bottom:18px;}
+.ct-title{font-weight:700;margin-bottom:6px;}
+.ct-hint{font-family:var(--fm);font-size:.7rem;color:var(--text3);line-height:1.5;margin-bottom:10px;}
+.ct-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);}
+.ct-row>div:first-child{flex:1;min-width:0;}
+.ct-sub{font-family:var(--fm);font-size:.66rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;}
+.ct-badge{font-family:var(--fm);font-size:.64rem;padding:3px 8px;border-radius:20px;background:var(--sur2);color:var(--text2);white-space:nowrap;}
+.ct-badge.ct-owner{color:var(--accent);}
+.ct-x{background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--danger);font-size:.68rem;padding:4px 8px;cursor:pointer;}
+.ct-form{display:grid;gap:8px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+.ct-form input,.ct-form select{padding:11px 12px;background:var(--sur2);border:1px solid var(--bord2);border-radius:var(--rmd);color:var(--text);font-family:var(--fb);}
