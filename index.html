@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<!-- Smart Market Pro v7.7 — Build 20260527 -->
+<html lang="fr" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080c10">
+<title>Smart Market Pro v7.7 | Enterprise</title>
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Smart%20Market%20Pro%22%2C%22short_name%22%3A%22SMP%22%2C%22description%22%3A%22Application%20de%20gestion%20commerciale%20pour%20commer%C3%A7ants%20africains.%20Ventes%2C%20stock%2C%20dettes%2C%20d%C3%A9penses%2C%20commissions%2C%20IA%20int%C3%A9gr%C3%A9e.%22%2C%22start_url%22%3A%22.%2F%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080c10%22%2C%22theme_color%22%3A%22%2300e87a%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22lang%22%3A%22fr%22%2C%22dir%22%3A%22ltr%22%2C%22id%22%3A%22smart-market-pro-v77%22%2C%22categories%22%3A%5B%22business%22%2C%22finance%22%2C%22productivity%22%5D%2C%22launch_handler%22%3A%7B%22client_mode%22%3A%22navigate-existing%22%7D%2C%22display_override%22%3A%5B%22standalone%22%2C%22minimal-ui%22%5D%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-384.png%22%2C%22sizes%22%3A%22384x384%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22maskable%22%7D%5D%2C%22shortcuts%22%3A%5B%7B%22name%22%3A%22Nouvelle%20Vente%22%2C%22short_name%22%3A%22Vente%22%2C%22description%22%3A%22Enregistrer%20une%20vente%20rapidement%22%2C%22url%22%3A%22.%2F%23sales%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%7D%5D%7D%2C%7B%22name%22%3A%22Tableau%20de%20bord%22%2C%22short_name%22%3A%22Dashboard%22%2C%22description%22%3A%22Voir%20le%20tableau%20de%20bord%22%2C%22url%22%3A%22.%2F%23dashboard%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-192.png%22%2C%22sizes%22%3A%22192x192%22%7D%5D%7D%5D%2C%22screenshots%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Femmanic007.github.io%2Fsmart-market-pro%2Ficon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22form_factor%22%3A%22narrow%22%2C%22label%22%3A%22Smart%20Market%20Pro%20Dashboard%22%7D%5D%2C%22prefer_related_applications%22%3Afalse%7D">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SMP">
+<script src="js/core/boot.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="(console.log||function(){})('[SMP] Google Fonts non disponible')">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/seller-mode.css">
+</head>
+<body>
+<div id="print-area"></div>
+
+<!-- AUTH -->
+<div id="auth-overlay">
+  <div class="auth-card" style="max-width:420px;width:100%">
+    <div class="auth-logo" id="auth-brand">Smart Market Pro</div>
+    <div class="auth-sub">v7.7 Free</div>
+
+    <!-- Liste des comptes locaux -->
+    <div id="auth-step-local">
+      <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);text-align:center;margin-bottom:12px" data-i18n="auth_who">Qui êtes-vous ?</div>
+      <div id="accounts-list" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button onclick="RecoveryManager.show()" style="background:none;border:none;color:var(--text3);font-size:.7rem;cursor:pointer;font-family:var(--fm);text-decoration:underline" data-i18n="auth_forgot_code">Code oublié ?</button>
+      </div>
+    </div>
+
+    <!-- Saisie PIN -->
+    <div id="auth-step-pin" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="Auth.backToAccounts()" style="background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--text2);cursor:pointer;font-size:.9rem;padding:4px 10px" data-i18n="ob_back">← Retour</button>
+        <div style="text-align:center;flex:1">
+          <div id="auth-selected-name" style="font-family:var(--fd);font-weight:800;font-size:.95rem"></div>
+          <div id="auth-selected-role" style="font-family:var(--fm);font-size:.62rem;color:var(--text3);margin-top:2px"></div>
+        </div>
+        <div style="width:60px"></div>
+      </div>
+      <div class="pin-display">
+        <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
+      </div>
+      <div id="pin-grid">
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('1')">1</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('2')">2</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('3')">3</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('4')">4</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('5')">5</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('6')">6</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('7')">7</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('8')">8</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('9')">9</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('⌫')">⌫</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('0')">0</button>
+        <button class="pin-btn" type="button" onclick="Auth.pinInput('✓')" style="color:var(--accent)">✓</button>
+      </div>
+      <div class="auth-error" id="auth-pin-error"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- RECOVERY MODAL -->
+<div id="recovery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:19999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:32px 28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg)">
+    <div style="font-family:var(--fd);font-size:1.1rem;font-weight:800;color:var(--accent);margin-bottom:6px" data-i18n="rec_title">🔑 Récupération d'accès</div>
+    <div style="font-size:.8rem;color:var(--text3);margin-bottom:20px;font-family:var(--fm)" data-i18n="rec_sub">Entrez votre code maître à 8 caractères</div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label" data-i18n="rec_code_label">Code Maître</label>
+      <input type="text" id="master-code-input" placeholder="Ex: SMP-A1B2C3" maxlength="12" style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:1.1rem">
+    </div>
+    <div id="recovery-error" style="font-size:.78rem;color:var(--danger);min-height:18px;margin-bottom:12px;text-align:center"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="RecoveryManager.hide()" data-i18n="smp_confirm_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" onclick="RecoveryManager.verify()" data-i18n="rec_access">Accéder</button>
+    </div>
+    <div style="margin-top:14px;font-size:.72rem;color:var(--text3);text-align:center;font-family:var(--fm)" data-i18n="rec_hint">Le code maître vous a été affiché lors de la première connexion</div>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div id="guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:19999;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:var(--fd);font-size:1.1rem;font-weight:800;color:var(--accent)" class="guide-title">📖 Guide d'utilisation</div>
+      <button onclick="Guide.hide()" style="background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer">✕</button>
+    </div>
+    <div id="guide-content"></div>
+  </div>
+</div>
+
+
+<!-- MODALE CONFIRMATION CUSTOM -->
+
+<!-- ONBOARDING PREMIER LANCEMENT -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:39999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:32px 28px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:slideUp .25s ease">
+    <!-- Étapes -->
+    <div id="ob-step-1">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:3rem;margin-bottom:8px">👋</div>
+        <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--accent)" data-i18n="ob_welcome_title">Bienvenue dans Smart Market Pro !</div>
+        <div style="font-size:.82rem;color:var(--text2);margin-top:8px;line-height:1.6" data-i18n="ob_welcome_sub">Configurons votre boutique en 3 étapes rapides pour que tout soit prêt dès maintenant.</div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" data-i18n="ob_shop_name_label">Nom de votre boutique *</label>
+        <input type="text" id="ob-shop-name" placeholder="Ex: Épicerie Eze, Boutique Grace..." data-i18n-placeholder="ob_shop_name_ph" maxlength="60">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" data-i18n="ob_phone_label">Téléphone (affiché sur les tickets)</label>
+        <input type="tel" id="ob-phone" placeholder="Ex: +225 07 00 00 00 00" inputmode="tel">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="Onboarding.step2()" style="padding:14px;font-size:.95rem" data-i18n="ob_next">Suivant →</button>
+    </div>
+
+    <div id="ob-step-2" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:3rem;margin-bottom:8px">💱</div>
+        <div style="font-family:var(--fd);font-size:1.1rem;font-weight:800;color:var(--text)" data-i18n="ob_currency_lang_title">Devise et langue</div>
+        <div style="font-size:.82rem;color:var(--text2);margin-top:8px" data-i18n="ob_currency_lang_sub">Ces réglages s'affichent sur tous vos tickets et rapports.</div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" data-i18n="ob_currency_label">Devise</label>
+        <select id="ob-currency">
+          <option value="FCFA">FCFA (Franc CFA)</option>
+          <option value="XOF">XOF</option>
+          <option value="GHS">GHS (Cedi ghanéen)</option>
+          <option value="NGN">NGN (Naira nigérian)</option>
+          <option value="KES">KES (Shilling kenyan)</option>
+          <option value="MAD">MAD (Dirham marocain)</option>
+          <option value="TND">TND (Dinar tunisien)</option>
+          <option value="EUR">EUR (Euro)</option>
+          <option value="USD">USD (Dollar US)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" data-i18n="ob_lang_label">Langue</label>
+        <select id="ob-lang">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="Onboarding.backTo(1)" data-i18n="ob_back">← Retour</button>
+        <button class="btn btn-primary" style="flex:1" onclick="Onboarding.step3()" style="padding:14px" data-i18n="ob_next">Suivant →</button>
+      </div>
+    </div>
+
+    <div id="ob-step-3" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:3rem;margin-bottom:8px">🔐</div>
+        <div style="font-family:var(--fd);font-size:1.1rem;font-weight:800;color:var(--text)" data-i18n="ob_security_title">Sécurité du compte admin</div>
+        <div style="font-size:.82rem;color:var(--text2);margin-top:8px;line-height:1.6"><span data-i18n="ob_security_sub_pre">Le PIN par défaut est</span> <strong style="color:var(--accent);font-family:var(--fm)">0000</strong><span data-i18n="ob_security_sub_post">. Changez-le maintenant pour sécuriser votre compte.</span></div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" data-i18n="ob_pin_new">Nouveau PIN (4 chiffres)</label>
+        <input type="password" id="ob-pin" maxlength="4" inputmode="numeric" placeholder="••••" style="text-align:center;letter-spacing:8px;font-size:1.2rem">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" data-i18n="ob_pin_confirm">Confirmer le PIN</label>
+        <input type="password" id="ob-pin2" maxlength="4" inputmode="numeric" placeholder="••••" style="text-align:center;letter-spacing:8px;font-size:1.2rem">
+      </div>
+      <div id="ob-error" style="font-size:.78rem;color:var(--danger);min-height:18px;margin-bottom:10px;text-align:center"></div>
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="Onboarding.backTo(2)" data-i18n="ob_back">← Retour</button>
+        <button class="btn btn-primary" style="flex:1" onclick="Onboarding.finish()" data-i18n="ob_finish">✅ Terminer</button>
+      </div>
+      <button class="btn btn-ghost btn-full" style="font-size:.75rem;color:var(--text3)" onclick="Onboarding.finish(true)" data-i18n="ob_keep_default_pin">Garder le PIN 0000 (non recommandé)</button>
+    </div>
+  </div>
+</div>
+
+<div id="smp-confirm-overlay">
+  <div id="smp-confirm-box">
+    <div id="smp-confirm-icon"></div>
+    <div id="smp-confirm-title"></div>
+    <div id="smp-confirm-msg"></div>
+    <div id="smp-confirm-input-wrap">
+      <label class="form-label" id="smp-confirm-input-label"></label>
+      <input type="text" id="smp-confirm-input" style="margin-top:6px">
+    </div>
+    <div id="smp-confirm-btns">
+      <button class="btn btn-ghost" style="flex:1" id="smp-confirm-cancel" data-i18n="smp_confirm_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" id="smp-confirm-ok" data-i18n="smp_confirm_ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE COMMANDE FOURNISSEUR -->
+<div id="smp-order-overlay">
+  <div id="smp-order-box">
+    <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent);margin-bottom:16px" data-i18n="smp_order_title">📦 Enregistrer une commande</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label" data-i18n="smp_order_supplier">Fournisseur</label>
+      <div id="smp-order-sup-name" style="font-weight:700;padding:8px 0;color:var(--text)"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label" data-i18n="smp_order_amount">Montant *</label>
+      <input type="number" id="smp-order-amount" inputmode="decimal" min="0" placeholder="0">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label" data-i18n="smp_order_desc">Description (optionnel)</label>
+      <input type="text" id="smp-order-desc" placeholder="Ex: Livraison marchandises..." data-i18n-placeholder="smp_order_desc_ph">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="SmpModal.closeOrder()" data-i18n="smp_confirm_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" onclick="SmpModal.confirmOrder()" data-i18n="smp_order_save">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- DRAWER NAV MOBILE -->
+<div id="mob-drawer-backdrop" onclick="MobNav.closeDrawer()"></div>
+<div id="mob-drawer">
+  <div class="drawer-handle"></div>
+  <div id="mob-drawer-grid" class="drawer-grid"></div>
+</div>
+
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner">
+  <div class="pwa-banner-icon">📲</div>
+  <div class="pwa-banner-text">
+    <div class="pwa-banner-title" data-i18n="pwa_install_title">Installer Smart Market Pro</div>
+    <div class="pwa-banner-sub" data-i18n="pwa_install_sub">Accès direct depuis votre écran d'accueil, fonctionne hors-ligne</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="PWA.install()" style="white-space:nowrap;flex-shrink:0" data-i18n="pwa_install_btn">Installer</button>
+  <button onclick="PWA.dismissBanner()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;padding:4px;flex-shrink:0">✕</button>
+</div>
+
+
+<!-- MODALE PAIEMENT PARTIEL -->
+<div id="smp-partial-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:29999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:28px 24px;width:100%;max-width:360px;box-shadow:var(--shadow-lg);animation:slideUp .18s ease">
+    <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent);margin-bottom:6px" data-i18n="partial_title">💳 Encaissement Partiel</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:14px" id="smp-partial-info"></div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label" data-i18n="partial_amount_label">Montant encaissé *</label>
+      <input type="number" id="smp-partial-amount" inputmode="decimal" min="0" placeholder="0">
+    </div>
+    <div id="smp-partial-rest" style="font-family:var(--fm);font-size:.75rem;color:var(--text3);margin-bottom:14px;min-height:18px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="Debts.closePartial()" data-i18n="smp_confirm_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" onclick="Debts.confirmPartial()" data-i18n="partial_confirm">✅ Encaisser</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- RÉSUMÉ FIN DE JOURNÉE -->
+<div id="eod-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:19999;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:0;width:100%;max-width:420px;box-shadow:var(--shadow-lg);animation:slideUp .3s ease;overflow:hidden;max-height:90vh;overflow-y:auto">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,var(--accent),var(--acc2));padding:20px 24px">
+      <div style="font-family:var(--fd);font-size:1.2rem;font-weight:800;color:#000" data-i18n="eod_title">📊 Résumé de la Journée</div>
+      <div style="font-family:var(--fm);font-size:.72rem;color:rgba(0,0,0,.6);margin-top:2px" id="eod-date"></div>
+    </div>
+    <!-- Sélecteur de mode de période -->
+    <div style="display:flex;gap:6px;padding:10px 24px 0;overflow-x:auto">
+      <button class="btn btn-ghost btn-sm eod-mode-btn" data-mode="day" onclick="EODSummary.setMode('day')" style="white-space:nowrap;padding:5px 12px;font-size:.72rem" data-i18n="eod_mode_day">Jour</button>
+      <button class="btn btn-ghost btn-sm eod-mode-btn" data-mode="week" onclick="EODSummary.setMode('week')" style="white-space:nowrap;padding:5px 12px;font-size:.72rem" data-i18n="eod_mode_week">Semaine</button>
+      <button class="btn btn-ghost btn-sm eod-mode-btn" data-mode="month" onclick="EODSummary.setMode('month')" style="white-space:nowrap;padding:5px 12px;font-size:.72rem" data-i18n="eod_mode_month">Mois</button>
+      <button class="btn btn-ghost btn-sm eod-mode-btn" data-mode="year" onclick="EODSummary.setMode('year')" style="white-space:nowrap;padding:5px 12px;font-size:.72rem" data-i18n="eod_mode_year">Année</button>
+      <button class="btn btn-ghost btn-sm eod-mode-btn" data-mode="custom" onclick="EODSummary.setMode('custom')" style="white-space:nowrap;padding:5px 12px;font-size:.72rem" data-i18n="eod_mode_custom">Personnalisé</button>
+    </div>
+    <!-- Sélecteur de date (jour/semaine/mois/année) -->
+    <div id="eod-nav-standard" style="display:flex;align-items:center;gap:8px;padding:12px 24px;border-bottom:1px solid var(--border)">
+      <button class="btn btn-ghost btn-sm" onclick="EODSummary.prevDay()" style="padding:6px 10px">◀</button>
+      <input type="date" id="eod-date-picker" onchange="EODSummary.onDateChange()" style="flex:1;text-align:center;font-size:.82rem;padding:6px 8px">
+      <button class="btn btn-ghost btn-sm" onclick="EODSummary.nextDay()" style="padding:6px 10px" id="eod-next-btn">▶</button>
+      <button class="btn btn-ghost btn-sm" onclick="EODSummary.goToday()" style="padding:6px 10px;white-space:nowrap" data-i18n="btn_today">Aujourd'hui</button>
+    </div>
+    <!-- Sélecteur de plage personnalisée -->
+    <div id="eod-nav-custom" style="display:none;align-items:center;gap:8px;padding:12px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:140px">
+        <label style="font-family:var(--fm);font-size:.68rem;color:var(--text3)" data-i18n="lbl_from">Du</label>
+        <input type="date" id="eod-custom-from" style="flex:1;font-size:.8rem;padding:6px 8px">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:140px">
+        <label style="font-family:var(--fm);font-size:.68rem;color:var(--text3)" data-i18n="lbl_to">Au</label>
+        <input type="date" id="eod-custom-to" style="flex:1;font-size:.8rem;padding:6px 8px">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="EODSummary.applyCustomRange()" style="white-space:nowrap" data-i18n="lbl_apply">Appliquer</button>
+    </div>
+    <!-- Contenu -->
+    <div style="padding:20px 24px" id="eod-content"></div>
+    <!-- Actions -->
+    <div style="padding:0 24px 20px;display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="EODSummary.close()" data-i18n="btn_close">Fermer</button>
+      <button class="btn btn-primary" style="flex:1" onclick="EODSummary.print()" data-i18n="btn_print">🖨️ Imprimer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- DASHBOARD VENDEUR (non-admin) -->
+<div id="seller-dash-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:7000;overflow-y:auto">
+  <div style="padding:16px;max-width:600px;margin:0 auto">
+    <!-- Header -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent)" id="sd-shop-name">Smart Market Pro</div>
+        <div style="font-family:var(--fm);font-size:.68rem;color:var(--text3)" id="sd-seller-name" data-i18n="role_seller">Vendeur</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-family:var(--fm);font-size:.65rem;color:var(--text3)" id="sd-date"></div>
+        <button class="btn btn-ghost btn-sm" onclick="Auth.logout()" data-i18n="sd_logout">⏏ Déconn.</button>
+      </div>
+    </div>
+
+    <!-- KPIs du vendeur -->
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card" style="--accent-color:var(--info)">
+        <div class="stat-label" data-i18n="sd_sales_today">Mes Ventes Aujourd'hui</div>
+        <div class="stat-value" id="sd-count">0</div>
+        <div class="stat-sub" id="sd-ca">CA : 0</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--accent)">
+        <div class="stat-label" data-i18n="sd_commission_month">Ma Commission du Mois</div>
+        <div class="stat-value" id="sd-comm">0</div>
+        <div class="stat-sub" id="sd-comm-sub" data-i18n="sd_rate">Taux : 0%</div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="SellerDash.goSales()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">🛒</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_new_sale">Nouvelle Vente</span>
+      </button>
+      <button class="btn btn-ghost" onclick="SellerDash.goStock()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">📦</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_view_stock">Voir le Stock</span>
+      </button>
+      <button class="btn btn-ghost" onclick="SellerMode.activate()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">🏪</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_seller_mode">Mode Vendeur</span>
+      </button>
+      <button class="btn btn-ghost" onclick="SellerDash.goDebts()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">💳</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_my_debts">Mes Dettes</span>
+      </button>
+      <button class="btn btn-ghost" onclick="SellerDash.openPrefs()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">🎨</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_appearance">Apparence</span>
+      </button>
+      <button class="btn btn-ghost" onclick="Guide.show()" style="padding:20px;flex-direction:column;gap:6px">
+        <span style="font-size:1.8rem">❓</span>
+        <span style="font-size:.82rem;font-weight:700" data-i18n="sd_help">Aide</span>
+      </button>
+    </div>
+
+    <!-- Mes dernières ventes -->
+    <div class="card">
+      <div class="card-title" data-i18n="sd_recent_sales">🕐 Mes Dernières Ventes</div>
+      <div id="sd-recent" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODALE ÉDITION UTILISATEUR -->
+<div id="smp-edit-user-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:29999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:28px 24px;width:100%;max-width:360px;box-shadow:var(--shadow-lg);animation:slideUp .18s ease">
+    <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent);margin-bottom:16px" data-i18n="eu_title">✏️ Modifier le compte</div>
+    <input type="hidden" id="edit-user-id">
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label" data-i18n="eu_name_label">Nom du vendeur *</label>
+      <input type="text" id="edit-user-name" placeholder="Nouveau nom..." data-i18n-placeholder="eu_name_ph" maxlength="40">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label" data-i18n="eu_pin_label">Nouveau PIN (laisser vide = inchangé)</label>
+      <input type="password" id="edit-user-pin" maxlength="4" inputmode="numeric"
+        placeholder="••••" style="text-align:center;letter-spacing:8px;font-size:1.1rem">
+    </div>
+    <div id="edit-user-error" style="font-size:.75rem;color:var(--danger);min-height:16px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="Users.closeEdit()" data-i18n="smp_confirm_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" onclick="Users.saveEdit()">💾 <span data-i18n="btn_save">Sauvegarder</span></button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SAISIE DIFFÉRÉE DES VENTES -->
+<div id="deferred-overlay">
+  <div class="deferred-header">
+    <div>
+      <div style="font-family:var(--fd);font-size:.95rem;font-weight:800;color:var(--accent)" data-i18n="deferred_title">📒 Saisie Différée</div>
+      <div style="font-family:var(--fm);font-size:.62rem;color:var(--text3);margin-top:1px" data-i18n="deferred_subtitle">Enregistrez les ventes notées dans votre cahier</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="DeferredSales.close()"><span data-i18n="btn_close">Fermer</span></button>
+  </div>
+
+  <div style="padding:14px;max-width:700px;margin:0 auto">
+
+    <!-- Sélection de la date -->
+    <div class="card" style="padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <label class="form-label" data-i18n="deferred_date">Date des ventes *</label>
+          <input type="date" id="def-date" onchange="DeferredSales.onDateChange()">
+        </div>
+        <div style="flex:1;min-width:160px">
+          <label class="form-label" data-i18n="deferred_seller">Vendeur</label>
+          <select id="def-seller">
+            <option value="" data-i18n="def_seller_self">— Moi-même —</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:160px">
+          <label class="form-label" data-i18n="ph_client">Nom du client (optionnel)</label>
+          <input type="text" id="def-client" placeholder="Client commun à toutes les lignes" data-i18n-placeholder="def_client_common_ph">
+        </div>
+      </div>
+      <div id="def-date-info" style="font-family:var(--fm);font-size:.72rem;color:var(--text3);margin-top:8px;min-height:16px"></div>
+    </div>
+
+    <!-- Résumé + bouton Ajouter en haut -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <div class="deferred-summary" id="def-summary" style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-family:var(--fm);font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px" data-i18n="def_summary_current">Résumé en cours</div>
+            <div style="font-family:var(--fd);font-weight:800;font-size:1.1rem;color:var(--accent)" id="def-total-display">0 F</div>
+          </div>
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--text2)" id="def-lines-info">0 ligne(s)</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" style="white-space:nowrap" onclick="DeferredSales.addLine()" data-i18n="deferred_add_line">+ Ajouter une ligne</button>
+    </div>
+
+    <!-- Lignes de vente -->
+    <div id="def-lines-container"></div>
+
+    <!-- Bouton Enregistrer en bas -->
+    <div style="margin-top:10px;margin-bottom:20px">
+      <button class="btn btn-primary btn-full" id="def-submit-btn" onclick="DeferredSales.submit()" disabled>
+        ✅ <span data-i18n="deferred_submit">Enregistrer tout</span>
+      </button>
+    </div>
+
+    <!-- Aide -->
+    <div style="background:var(--sur2);border-radius:var(--rmd);padding:14px;font-family:var(--fm);font-size:.72rem;color:var(--text3);line-height:1.8">
+      <strong style="color:var(--text2)" data-i18n="def_help_title">💡 Comment utiliser :</strong><br>
+      1. <span data-i18n="def_help_1">Choisissez la date où les ventes ont eu lieu</span><br>
+      2. <span data-i18n="def_help_2">Ajoutez une ligne par vente notée dans votre cahier</span><br>
+      3. <span data-i18n="def_help_3">Renseignez le produit, la quantité, et le montant payé</span><br>
+      4. <span data-i18n="def_help_4_pre">Cliquez</span> <strong data-i18n="def_help_4_btn">"Enregistrer tout"</strong> <span data-i18n="def_help_4_post">— les ventes apparaîtront à la bonne date dans l'historique</span>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- MODALE ÉDITION PRODUIT -->
+<div id="smp-edit-stock-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:29999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);padding:28px 24px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .18s ease">
+    <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent);margin-bottom:16px" data-i18n="btn_modify">✏️ Modifier le produit</div>
+    <input type="hidden" id="edit-stock-id">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label" data-i18n="lbl_name">Nom *</label><input type="text" id="edit-stock-name" maxlength="80"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_barcode">Code-barres</label><input type="text" id="edit-stock-code"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_buy_price">Prix Achat *</label><input type="number" id="edit-stock-buy" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_sell_price">Prix Vente *</label><input type="number" id="edit-stock-sell" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité *</label><input type="number" id="edit-stock-qty" min="0" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_alert_threshold">Seuil Alerte</label><input type="number" id="edit-stock-min" min="0" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_tva">TVA (%)</label><input type="number" id="edit-stock-tva" min="0" max="100" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_category">Catégorie</label><select id="edit-stock-cat"></select></div>
+      <div class="form-group" style="grid-column:1/-1"><label class="form-label" data-i18n="lbl_description">Description</label><input type="text" id="edit-stock-desc" placeholder="Détails..." data-i18n-placeholder="lbl_details"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-ghost" style="flex:1" onclick="Stock.closeEdit()" data-i18n="btn_cancel">Annuler</button>
+      <button class="btn btn-primary" style="flex:1" onclick="Stock.saveEdit()" data-i18n="btn_save">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- RAPPORT RUPTURE DE STOCK -->
+<div id="restock-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:19000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .25s ease">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,rgba(255,59,92,.15),rgba(255,186,0,.08));padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;background:var(--surface)">
+      <div>
+        <div style="font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--danger)" data-i18n="restock_title">📦 Rapport d'Approvisionnement</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--text3);margin-top:2px" id="restock-subtitle" data-i18n="rs_analyzing">Analyse en cours...</div>
+      </div>
+      <button onclick="RestockReport.close()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.2rem;padding:4px">✕</button>
+    </div>
+    <!-- Stats rapides -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px;border-bottom:1px solid var(--border)">
+      <div style="text-align:center;padding:8px;background:rgba(255,59,92,.06);border-radius:var(--rmd)">
+        <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--danger)" id="rs-count-out">0</div>
+        <div style="font-family:var(--fm);font-size:.6rem;color:var(--text3);text-transform:uppercase" data-i18n="restock_out">En rupture</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(255,186,0,.06);border-radius:var(--rmd)">
+        <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--warning)" id="rs-count-low">0</div>
+        <div style="font-family:var(--fm);font-size:.6rem;color:var(--text3);text-transform:uppercase" data-i18n="restock_low">Stock faible</div>
+      </div>
+      <div style="text-align:center;padding:8px;background:rgba(0,232,122,.06);border-radius:var(--rmd)">
+        <div style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--accent)" id="rs-cost-total">0</div>
+        <div style="font-family:var(--fm);font-size:.6rem;color:var(--text3);text-transform:uppercase" data-i18n="restock_cost">Coût estimé</div>
+      </div>
+    </div>
+    <!-- Liste articles -->
+    <div style="padding:14px 16px" id="restock-list"></div>
+    <!-- Footer -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="RestockReport.close()" data-i18n="btn_close">Fermer</button>
+      <button class="btn btn-info btn-sm" style="flex:1" onclick="RestockReport.exportCSV()">📊 <span data-i18n="btn_export">Exporter</span></button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODALE PRÉFÉRENCES VENDEUR -->
+<div id="seller-prefs-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:39000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--bord2);border-radius:var(--rxl);width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .2s ease">
+    <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div style="font-family:var(--fd);font-size:.95rem;font-weight:800;color:var(--accent)" data-i18n="sp_appearance">🎨 Apparence</div>
+      <button onclick="SellerDash.closePrefs()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.2rem">✕</button>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- Thème clair/sombre -->
+      <div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="sp_theme">Thème</div>
+        <div style="display:flex;gap:10px">
+          <button onclick="Settings.setTheme('dark')" class="btn btn-ghost" style="flex:1;flex-direction:column;gap:4px;padding:12px">
+            <span style="font-size:1.4rem">🌙</span>
+            <span style="font-size:.72rem" data-i18n="sp_dark">Sombre</span>
+          </button>
+          <button onclick="Settings.setTheme('light')" class="btn btn-ghost" style="flex:1;flex-direction:column;gap:4px;padding:12px">
+            <span style="font-size:1.4rem">☀️</span>
+            <span style="font-size:.72rem" data-i18n="sp_light">Clair</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Couleur accent -->
+      <div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="sp_main_color">Couleur principale</div>
+        <div id="seller-accent-colors" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+
+      <!-- Langue -->
+      <div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="lbl_language">Langue</div>
+        <div style="display:flex;gap:10px">
+          <button onclick="SellerDash.setLang('fr')" class="btn btn-ghost" style="flex:1" id="seller-lang-fr">🇫🇷 Français</button>
+          <button onclick="SellerDash.setLang('en')" class="btn btn-ghost" style="flex:1" id="seller-lang-en">🇬🇧 English</button>
+        </div>
+      </div>
+
+      <!-- Taille du texte -->
+      <div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="sp_font_size">Taille du texte</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="SellerDash.setFontSize(-1)" class="btn btn-ghost btn-sm" style="font-size:1rem;padding:8px 14px">A−</button>
+          <span id="seller-font-size" style="font-family:var(--fm);font-size:.82rem;color:var(--text2);flex:1;text-align:center">16px</span>
+          <button onclick="SellerDash.setFontSize(1)" class="btn btn-ghost btn-sm" style="font-size:1.2rem;padding:8px 14px">A+</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="SellerDash.closePrefs()" data-i18n="btn_close">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="sync-indicator"><div class="spin-dot"></div><span>Sync...</span></div>
+
+<!-- MOB HEADER -->
+<header id="mob-header">
+  <div class="mob-logo" id="mob-brand">SMP</div>
+  <div class="mob-right">
+    <div class="mob-user"><span id="mob-username">—</span></div>
+    <div class="cloud-dot" id="mob-cloud"></div>
+    <button class="admin-only" onclick="SellerMode.activate()" style="background:none;border:1px solid var(--accent);border-radius:var(--rsm);color:var(--accent);font-size:.75rem;cursor:pointer;padding:4px 8px;font-weight:700"><span style="display:inline-flex;width:16px;height:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span></button>
+    <button onclick="Guide.show()" style="background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:4px 6px">❓</button>
+    <button class="btn btn-ghost btn-sm" onclick="Auth.logout()" style="font-size:.72rem;padding:4px 8px" data-action="logout"><span style="display:inline-flex;width:14px;height:14px;margin-right:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Quitter</button>
+  </div>
+</header>
+
+<!-- TOP NAV -->
+<nav id="top-nav">
+  <div class="nav-logo" id="nav-brand">Smart Market Pro</div>
+
+  <!-- Onglets fixes (toujours visibles) -->
+  <div class="nav-tab active" id="tab-dashboard" onclick="UI.switchTab('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Accueil</div>
+  <div class="nav-tab"        id="tab-sales"     onclick="UI.switchTab('sales')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span> Ventes</div>
+  <div class="nav-tab"        id="tab-stock"     onclick="UI.switchTab('stock')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Stock</div>
+  <div class="nav-tab admin-only" id="tab-analytics" onclick="UI.switchTab('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Analyses</div>
+  <div class="nav-tab admin-only" id="tab-history"   onclick="UI.switchTab('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/><polyline points="12 7 12 12 16 14"/></svg></span> Historique</div>
+
+  <!-- Bouton "Plus" dropdown admin -->
+  <div id="nav-more-wrap">
+    <button id="nav-more-btn" onclick="NavDesktop.toggle()" class="admin-only">
+      ▾ <span data-i18n="nav_more">Plus</span> <span id="nav-more-badge" style="display:none;background:var(--danger);color:#fff;font-family:var(--fm);font-size:.55rem;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;vertical-align:middle"></span>
+    </button>
+    <div id="nav-dropdown">
+      <div class="nav-drop-item" id="drop-restock" onclick="RestockReport.open();NavDesktop.close()" id="drop-restock"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span> <span data-i18n="nav_restock">Approvisionnement</span></div>
+      <div class="nav-drop-sep"></div>
+      <div class="nav-drop-item" id="drop-debts" onclick="NavDesktop.go('debts')" id="drop-debts"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> <span data-i18n="nav_debts">Dettes</span></div>
+      <div class="nav-drop-item" id="drop-expenses" onclick="NavDesktop.go('expenses')" id="drop-expenses"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></span> <span data-i18n="nav_expenses">Dépenses</span></div>
+      <div class="nav-drop-item" id="drop-cashreport" onclick="NavDesktop.go('cashreport')" id="drop-cashreport"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span> <span data-i18n="nav_cashreport">Caisse</span></div>
+      <div class="nav-drop-item" id="drop-commissions" onclick="NavDesktop.go('commissions')" id="drop-commissions"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> <span data-i18n="nav_commissions">Commissions</span></div>
+      <div class="nav-drop-sep"></div>
+      <div class="nav-drop-item" onclick="NavDesktop.go('users')"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> <span data-i18n="nav_users">Équipe</span></div>
+      <div class="nav-drop-item" id="drop-suppliers" onclick="NavDesktop.go('suppliers')" id="drop-suppliers"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> <span data-i18n="nav_suppliers">Fournisseurs</span></div>
+      <div class="nav-drop-item" id="drop-loyalty" onclick="NavDesktop.go('loyalty')" id="drop-loyalty"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> <span data-i18n="nav_loyalty">Fidélité</span></div>
+      <div class="nav-drop-item" id="drop-returns" onclick="NavDesktop.go('returns')" id="drop-returns"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></span> <span data-i18n="nav_returns">Retours</span></div>
+      <div class="nav-drop-item" id="drop-objectives" onclick="NavDesktop.go('objectives')" id="drop-objectives"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> <span data-i18n="nav_objectives">Objectifs</span></div>
+      <div class="nav-drop-item" id="drop-categories" onclick="NavDesktop.go('categories')" id="drop-categories"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> <span data-i18n="nav_categories">Catégories</span></div>
+      <div class="nav-drop-sep"></div>
+      <div class="nav-drop-item" onclick="NavDesktop.go('ai')"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span> <span data-i18n="nav_ai">IA</span></div>
+      <div class="nav-drop-item" onclick="NavDesktop.go('bizimport')"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> <span data-i18n="nav_bizimport_full">Import IA</span></div>
+      <div class="nav-drop-sep"></div>
+      <div class="nav-drop-item" onclick="NavDesktop.go('settings')"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> <span data-i18n="nav_settings">Paramètres</span></div>
+      <div class="nav-drop-item" onclick="NavDesktop.go('config')"><span class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span> <span data-i18n="nav_system">Système</span></div>
+    </div>
+  </div>
+
+  <!-- Droite : infos + actions -->
+  <div class="nav-right">
+    <div class="cloud-dot" id="cloud-dot"></div>
+    <span class="nav-badge">v7.7</span>
+    <div class="nav-user"><span id="nav-username">—</span></div>
+    <button class="btn btn-ghost btn-sm admin-only" onclick="SellerMode.activate()" title="Mode Vendeur" data-i18n-title="nav_seller_mode_title" style="font-size:.82rem;padding:5px 10px;color:var(--accent);border-color:var(--accent)"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span> <span data-i18n="role_seller">Vendeur</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="Guide.show()" title="Guide" style="padding:5px 8px"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></button>
+    <button class="btn btn-primary btn-sm" onclick="Auth.logout()" data-action="logout" style="padding:5px 12px"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Déconnecter</button>
+  </div>
+</nav>
+
+<!-- IDs fantômes pour les onglets retirés de la nav (UI.switchTab les cherche) -->
+<span id="tab-config"      style="display:none"></span>
+<span id="tab-settings"    style="display:none"></span>
+<span id="tab-ai"          style="display:none"></span>
+<span id="tab-suppliers"   style="display:none"></span>
+<span id="tab-categories"  style="display:none"></span>
+<span id="tab-returns"     style="display:none"></span>
+<span id="tab-loyalty"     style="display:none"></span>
+<span id="tab-objectives"  style="display:none"></span>
+<span id="tab-bizimport"   style="display:none"></span>
+<span id="tab-expenses"    style="display:none"></span>
+<span id="tab-cashreport"  style="display:none"></span>
+<span id="tab-commissions" style="display:none"></span>
+<span id="tab-users"       style="display:none"></span>
+<span id="tab-debts"       style="display:none"></span>
+
+<!-- MAIN -->
+<div class="container">
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+  <div class="page-header">
+    <h1 class="page-title">🏠 <span id="dash-greeting" data-i18n="dash_hello">Bonjour</span></h1>
+    <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3)" id="dash-date"></div>
+  </div>
+
+  <!-- KPIs du jour -->
+  <div class="stats-grid" style="margin-bottom:16px">
+    <div class="stat-card" style="--accent-color:var(--info)"><div class="stat-label" id="dash-ca-label" data-i18n="dash_ca_today">CA Aujourd'hui</div><div class="stat-value" id="dash-ca-today">0</div><div class="stat-sub" id="dash-ca-sub">0 ventes</div></div>
+    <div class="stat-card" style="--accent-color:var(--accent)"><div class="stat-label" id="dash-profit-label" data-i18n="dash_profit_today">Profit du Jour</div><div class="stat-value" id="dash-pft-today">0</div><div class="stat-sub" id="dash-margin-sub">Marge : 0%</div></div>
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" id="dash-debt-label" data-i18n="dash_debt_current">Dettes en Cours</div><div class="stat-value" id="dash-debt">0</div><div class="stat-sub" id="dash-debt-clients">0 client(s)</div></div>
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" id="dash-alerts-label" data-i18n="dash_stock_alert">Stock en Alerte</div><div class="stat-value" id="dash-alerts">0</div><div class="stat-sub" data-i18n="dash_restock_needed">Produits à réappro</div></div>
+    <div class="stat-card" style="--accent-color:#e87a00"><div class="stat-label" data-i18n="dash_expenses_today">💸 Dépenses du Jour</div><div class="stat-value" id="dash-expenses-today">0</div><div class="stat-sub" id="dash-expenses-sub" data-i18n="dash_expenses_none">0 dépense(s)</div></div>
+    <div class="stat-card" style="--accent-color:#7a00e8;cursor:pointer" onclick="EODSummary.show()"><div class="stat-label" data-i18n="dash_eod_shortcut">📋 Résumé Fin de Journée</div><div class="stat-value" style="font-size:1.4rem">EOD</div><div class="stat-sub" data-i18n="lbl_tap_to_view">Appuyer pour voir →</div></div>
+  </div>
+
+  <!-- Conseil IA du jour -->
+  <div class="card" style="border-left:3px solid var(--accent);background:linear-gradient(135deg,var(--surface),var(--sur2))">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="font-size:1.6rem;flex-shrink:0">🤖</div>
+      <div>
+        <div style="font-family:var(--fd);font-size:.82rem;font-weight:700;color:var(--accent);margin-bottom:6px" data-i18n="dash_ai_tip_title">Conseil IA du jour</div>
+        <div id="dash-ai-tip" style="font-size:.82rem;color:var(--text2);line-height:1.6" data-i18n="dash_analyzing">Analyse en cours...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objectif journalier -->
+  <div class="card" id="dash-obj-card" style="padding:14px 16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-family:var(--fd);font-size:.82rem;font-weight:700" data-i18n="dash_daily_objective">🎯 Objectif du Jour</div>
+      <span style="font-family:var(--fm);font-size:.72rem;color:var(--accent)" id="dash-obj-pct">0%</span>
+    </div>
+    <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden">
+      <div id="dash-obj-bar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .8s ease"></div>
+    </div>
+    <div style="font-family:var(--fm);font-size:.65rem;color:var(--text3);margin-top:4px" id="dash-obj-label" data-i18n="dash_no_objective_set">Aucun objectif défini — configurez dans Objectifs</div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="card">
+    <div class="card-title" data-i18n="dash_quick_actions">⚡ Actions Rapides</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <button class="btn btn-primary" onclick="UI.switchTab('sales')" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">🛒</span><span style="font-size:.72rem" data-i18n="btn_add_sale">Nouvelle Vente</span></button>
+      <button class="btn btn-ghost" onclick="UI.switchTab('stock')" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">📦</span><span style="font-size:.72rem" data-i18n="dash_manage_stock">Gérer le Stock</span></button>
+      <button class="btn btn-ghost admin-only" onclick="UI.switchTab('analytics')" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">📈</span><span style="font-size:.72rem" data-i18n="dash_view_analytics">Voir Analyses</span></button>
+      <button class="btn btn-ghost admin-only" onclick="UI.switchTab('debts')" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">💳</span><span style="font-size:.72rem" data-i18n="nav_debts_full">Dettes Clients</span></button>
+      <button class="btn btn-ghost admin-only" onclick="UI.switchTab('ai')" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">🤖</span><span style="font-size:.72rem" data-i18n="dash_ai_assistant">IA Assistant</span></button>
+      <button class="btn btn-ghost admin-only" onclick="ExcelExport.daily()" style="flex-direction:column;gap:4px;padding:16px 10px"><span style="font-size:1.4rem">📊</span><span style="font-size:.72rem" data-i18n="dash_export_daily">Export Journalier</span></button>
+      <button class="btn btn-ghost admin-only" onclick="DeferredSales.open()" style="flex-direction:column;gap:4px;padding:16px 10px;border-color:var(--warning)"><span style="font-size:1.4rem">📒</span><span style="font-size:.72rem" data-i18n="dash_deferred_entry">Saisie Différée</span></button>
+    </div>
+  </div>
+
+  <!-- Dernières ventes -->
+  <div class="card">
+    <div class="card-title" data-i18n="dash_recent_sales">🕐 Dernières Ventes</div>
+    <div id="dash-recent-sales" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
+  <!-- Top produits du jour -->
+  <div class="card admin-only">
+    <div class="card-title" data-i18n="dash_top_products">🏅 Top Produits du Jour</div>
+    <div id="dash-top-products"></div>
+  </div>
+</section>
+
+<!-- VENTES -->
+<section id="sales" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="sales_title">Caisse <span>Enregistreuse</span></h1>
+    <button class="btn btn-ghost btn-sm admin-only" onclick="DeferredSales.open()"
+      style="border-color:var(--warning);color:var(--warning)"
+      title="Saisir des ventes d'un jour passé — comme dans un cahier" data-i18n-title="sale_deferred_tooltip">
+      📒 <span data-i18n="deferred_title_short">Saisie Différée</span>
+    </button>
+  </div>
+  <div class="card">
+    <div class="card-title" id="card-title-new-sale" data-i18n="card_new_sale">Nouvelle Vente</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_name">Article</label>
+        <input type="text" id="s-item-search" placeholder="🔍 Rechercher un article..." data-i18n-placeholder="ph_search_item" autocomplete="off" style="margin-bottom:6px;font-size:.82rem" oninput="UI._filterItemSelect(this.value)">
+        <select id="s-item" onchange="Sales.syncFields()"></select>
+      </div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité</label><input type="number" id="s-qty" value="1" min="1" inputmode="numeric" oninput="Sales.validate()"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_sell">Prix Unitaire <button type="button" onclick="Sales.toggleDiscount()" style="background:none;border:none;color:var(--warning);font-size:.65rem;cursor:pointer;font-family:var(--fm);text-decoration:underline;padding:0;margin-left:6px" id="s-discount-toggle">± Modifier le prix</button></label><input type="number" id="s-price" inputmode="decimal" oninput="Sales.validate()"></div>
+      <div class="form-group" id="s-discount-wrap" style="display:none">
+        <label class="form-label" style="color:var(--warning)"><span data-i18n="lbl_real_sell_price">Prix réel de vente</span> <span style="font-size:.6rem" data-i18n="lbl_modified">(modifié)</span></label>
+        <input type="number" id="s-real-price" inputmode="decimal" oninput="Sales.validate()" placeholder="Prix négocié..." data-i18n-placeholder="ph_negotiated_price">
+        <div style="margin-top:4px">
+          <input type="text" id="s-discount-reason" placeholder="Motif : fidélité, négociation... (optionnel)" data-i18n-placeholder="ph_discount_reason" style="font-size:.72rem;padding:6px 10px">
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_paid">Montant Payé <button type="button" onclick="Sales.setFullCredit()" style="background:none;border:none;color:var(--danger);font-size:.65rem;cursor:pointer;font-family:var(--fm);text-decoration:underline;padding:0;margin-left:6px">🔴 <span data-i18n="lbl_full_credit">Vente à crédit</span></button></label><input type="number" id="s-paid" inputmode="decimal" placeholder="Vide = tout payé" data-i18n-placeholder="ph_paid" oninput="Sales.validate()"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_client">Nom Client (dettes)</label><input type="text" id="s-client" placeholder="—"></div>
+      <div class="form-group" id="s-change-wrap" style="display:none">
+        <label class="form-label" data-i18n="lbl_change_due">Rendu Monnaie</label>
+        <div id="s-change-display" style="font-family:var(--fd);font-size:1.4rem;font-weight:800;color:var(--accent);padding:10px 14px;background:rgba(0,232,122,.08);border:1.5px solid var(--accent);border-radius:var(--rmd);text-align:center">0 F</div>
+      </div>
+    </div>
+    <div id="sale-warning" data-i18n="sale_warning_neg_margin">⚠️ Prix de vente inférieur au prix d'achat — marge négative !</div>
+    <div class="sale-action-row">
+      <button class="btn btn-primary" id="btn-do-sale" onclick="Sales.process()" disabled>✅ VALIDER LA VENTE</button>
+      <div id="sale-total-preview"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0" id="card-title-today-tx" data-i18n="card_today_sales">Transactions du Jour</div>
+      <input type="search" id="sales-search" placeholder="🔍 Client ou produit..." data-i18n-placeholder="ph_search_client_product"
+        style="flex:1;min-width:160px;max-width:260px;padding:8px 12px;font-size:.82rem"
+        oninput="Sales.filterTable(this.value)">
+      <button class="btn btn-danger btn-sm" id="sales-delete-sel-btn" onclick="Sales.deleteSelectedToday()" style="display:none">🗑️ <span data-i18n="lbl_delete_selection">Supprimer la sélection</span> (<span id="sales-sel-count">0</span>)</button>
+      <button class="btn btn-info btn-sm" id="btn-day-report" onclick="Printer.printDayReport()">🖨️ Rapport journalier</button>
+      <button class="btn btn-warning btn-sm" onclick="Share.dayReport()" title="Partager sur WhatsApp" data-i18n-title="lbl_share_whatsapp">📤 <span data-i18n="lbl_share">Partager</span></button>
+    </div>
+    <div class="table-wrap">
+      <table id="tableSales">
+        <thead><tr><th style="width:36px"><input type="checkbox" class="row-check" id="sales-check-all" onchange="Sales.toggleAllToday(this.checked)"></th><th data-i18n="th_time">Heure</th><th data-i18n="th_seller">Vendeur</th><th data-i18n="th_product">Produit</th><th data-i18n="th_qty">Qté</th><th data-i18n="th_total">Total</th><th data-i18n="th_status">Statut</th><th data-i18n="th_action">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- STOCK -->
+<section id="stock" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="stock_title">Gestion <span>Inventaire</span></h1></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--info)"><div class="stat-label" data-i18n="lbl_purchase_value">Valeur Achat</div><div class="stat-value" id="v-stock-buy">0</div><div class="stat-sub" data-i18n="lbl_immobilized_cost">Coût immobilisé</div></div>
+    <div class="stat-card" style="--accent-color:var(--accent)"><div class="stat-label" data-i18n="lbl_sell_value">Valeur Vente</div><div class="stat-value" id="v-stock-sell">0</div><div class="stat-sub" data-i18n="lbl_revenue_potential">Potentiel revenus</div></div>
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" data-i18n="lbl_low_stock">En Alerte</div><div class="stat-value" id="v-stock-alerts">0</div><div class="stat-sub" data-i18n="lbl_stock_min">Stock ≤ minimum</div></div>
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" data-i18n="lbl_references">Références</div><div class="stat-value" id="v-stock-count">0</div><div class="stat-sub" data-i18n="lbl_products_registered">Produits enregistrés</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="add_restock">Ajouter / Réapprovisionner</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label" data-i18n="lbl_product_name">Nom du Produit *</label><input type="text" id="i-name"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_barcode">Code-barres</label><input type="text" id="i-code"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_buy_price_f">Prix Achat (F) *</label><input type="number" id="i-buy" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_sell_price_f">Prix Vente (F) *</label><input type="number" id="i-sell" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="def_qty_star">Quantité *</label><input type="number" id="i-qty" min="1" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_alert_threshold">Seuil Alerte</label><input type="number" id="i-min" placeholder="5" min="1" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_category">Catégorie</label><select id="i-category"><option value="Autre">Autre</option></select></div>
+      <div class="form-group" style="grid-column:1/-1"><label class="form-label" data-i18n="lbl_desc_optional">Description (optionnel)</label><input type="text" id="i-desc" placeholder="Référence, détails fournisseur..." data-i18n-placeholder="ph_ref_details"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_supplier">Fournisseur</label><select id="i-supplier"><option value="" data-i18n="lbl_none_m">— Aucun —</option></select></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_tva">TVA %</label><input type="number" id="i-tva" placeholder="0" min="0" max="100" value="0" inputmode="numeric"></div>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="Stock.add()" data-i18n="add_stock_btn">+ AJOUTER AU STOCK</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="card-title" style="margin-bottom:0" data-i18n="lbl_full_inventory">Inventaire Complet</div>
+      <input type="search" id="stock-search" placeholder="🔍 Rechercher un produit..." data-i18n-placeholder="ph_search_product"
+        style="flex:1;min-width:180px;max-width:320px;padding:8px 12px;font-size:.82rem"
+        oninput="Stock.filterTable(this.value)">
+    </div>
+    <div class="table-wrap">
+      <table id="tableStock">
+        <thead><tr><th data-i18n="th_code">Code</th><th data-i18n="th_name">Désignation</th><th data-i18n="th_buy">Achat</th><th data-i18n="th_sell">Vente</th><th data-i18n="th_margin">Marge</th><th data-i18n="th_vat">TVA</th><th data-i18n="th_stock">Stock</th><th data-i18n="th_category">Catégorie</th><th data-i18n="th_state">État</th><th data-i18n="th_actions">Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS -->
+<section id="analytics" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="analytics_title">Indicateurs <span>Performance</span></h1>
+    <div class="ph-controls">
+      <input type="number" id="cash-init" placeholder="Fond de caisse" data-i18n-placeholder="lbl_cash_fund" inputmode="decimal" onchange="Analytics.updateCash()">
+      <select id="timePeriod" onchange="Analytics.onPeriodChange()">
+        <option value="day" data-i18n="period_today">Aujourd'hui</option><option value="week" data-i18n="period_7days">7 derniers jours</option>
+        <option value="month" data-i18n="period_month">Mois en cours</option><option value="year" data-i18n="period_year">Année en cours</option>
+        <option value="custom" data-i18n="lbl_custom_dates">Dates personnalisées</option>
+      </select>
+    </div>
+  </div>
+  <div id="analytics-custom-range" style="display:none;align-items:center;gap:8px;padding:12px 16px;margin-bottom:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:140px">
+      <label style="font-family:var(--fm);font-size:.68rem;color:var(--text3)" data-i18n="lbl_from">Du</label>
+      <input type="date" id="analytics-custom-from" style="flex:1;font-size:.8rem;padding:6px 8px">
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:140px">
+      <label style="font-family:var(--fm);font-size:.68rem;color:var(--text3)" data-i18n="lbl_to">Au</label>
+      <input type="date" id="analytics-custom-to" style="flex:1;font-size:.8rem;padding:6px 8px">
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="Analytics.applyCustomRange()" style="white-space:nowrap" data-i18n="lbl_apply">Appliquer</button>
+  </div>
+  <div id="system-alerts" class="alert-list"></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--info)"><div class="stat-label" data-i18n="lbl_revenue_total">Chiffre d'Affaires</div><div class="stat-value" id="st-ca">0</div><div class="stat-sub" id="st-ca-sub"></div><div class="stat-sub" id="st-returns-info" style="display:none;color:var(--danger)"></div></div>
+    <div class="stat-card" style="--accent-color:var(--accent)"><div class="stat-label" data-i18n="lbl_net_profit">Profit Net</div><div class="stat-value" id="st-pft">0</div><div class="stat-sub" id="st-margin-sub"></div></div>
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" data-i18n="nav_debts_full">Dettes Clients</div><div class="stat-value" id="st-debt">0</div><div class="stat-sub" id="st-debt-sub"></div></div>
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" data-i18n="lbl_liquidity">Liquidités</div><div class="stat-value" id="st-cash">0</div><div class="stat-sub" data-i18n="lbl_liquidity_formula">Caisse + CA - Dettes</div></div>
+  </div>
+  <div class="analytics-bottom">
+    <div class="card chart-card"><div class="card-title" data-i18n="lbl_sales_evolution">Évolution des Ventes</div><div class="chart-wrap"><canvas id="mainChart"></canvas></div></div>
+    <div class="card"><div class="card-title" data-i18n="lbl_top_products_ca">Top Produits (CA)</div><div id="top-products-list"></div></div>
+    <div class="card"><div class="card-title" data-i18n="lbl_sellers_perf">Performance Vendeurs</div><div id="sellers-perf-list"></div></div>
+  </div>
+</section>
+
+<!-- DETTES -->
+<section id="debts" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="debts_title">Dettes <span>Clients</span></h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="DeferredSales.open()" style="border-color:var(--warning)">📒 <span data-i18n="lbl_add_debt">Ajouter une dette</span></button>
+      <button class="btn btn-info btn-sm" onclick="Printer.exportDebtsPDF()">📄 <span data-i18n="lbl_export_pdf">Export PDF</span></button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" data-i18n="lbl_total_debts">Total Dettes</div><div class="stat-value" id="dt-total">0</div></div>
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" data-i18n="debt_clients">Clients Débiteurs</div><div class="stat-value" id="dt-count">0</div></div>
+    <div class="stat-card" style="--accent-color:var(--info)"><div class="stat-label" data-i18n="lbl_avg_debt">Dette Moyenne</div><div class="stat-value" id="dt-avg">0</div></div>
+    <div class="stat-card" style="--accent-color:var(--accent)"><div class="stat-label" data-i18n="lbl_max_debt">Dette Max</div><div class="stat-value" id="dt-max">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_debts_registry">Registre des Dettes</div>
+    <div class="table-wrap">
+      <table id="tableDebts">
+        <thead><tr><th data-i18n="th_client">Client</th><th data-i18n="th_debt">Dette Totale</th><th data-i18n="th_last_buy">Dernier Achat</th><th data-i18n="th_transactions">Transactions</th><th data-i18n="th_action">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card" id="debt-detail" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:0" id="debt-detail-title">—</div>
+      <button class="btn btn-ghost btn-sm" onclick="Debts.closeDetail()">✕</button>
+    </div>
+    <div class="table-wrap">
+      <table id="tableDebtDetail">
+        <thead><tr><th data-i18n="lbl_date">Date</th><th data-i18n="th_product">Produit</th><th data-i18n="th_total">Total</th><th data-i18n="th_debt_short">Dette</th><th data-i18n="th_action">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="Debts.markAllPaid()">✅ <span data-i18n="lbl_mark_all_paid">Tout marquer payé</span></button>
+  </div>
+</section>
+
+<!-- ÉQUIPE -->
+<section id="users" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="team_title">Gestion <span>Équipe</span></h1></div>
+  <div style="background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.25);border-radius:var(--rlg);padding:12px 16px;margin-bottom:16px;font-family:var(--fm);font-size:.78rem;color:var(--text2);line-height:1.6" data-i18n="team_info">
+    💡 Créez un compte PIN pour chaque personne qui utilise cet appareil. Chaque personne se connecte avec son propre code PIN et ses ventes sont suivies séparément.
+  </div>
+
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_create_account">Créer un Compte</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label" data-i18n="lbl_full_name">Nom Complet *</label><input type="text" id="u-name"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_pin_code">Code PIN (4 chiffres) *</label><input type="password" id="u-pin" maxlength="4" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="ob_pin_confirm">Confirmer PIN *</label><input type="password" id="u-pin2" maxlength="4" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="th_role">Rôle</label><select id="u-role"><option value="seller" data-i18n="role_seller">Vendeur</option><option value="admin" data-i18n="role_admin_full">Administrateur</option></select></div>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="Users.add()" data-i18n="create_account_btn">CRÉER LE COMPTE</button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_user_accounts">Comptes Utilisateurs</div>
+    <div class="table-wrap">
+      <table id="tableUsers">
+        <thead><tr><th data-i18n="lbl_name">Nom</th><th data-i18n="th_role">Rôle</th><th data-i18n="nav_sales">Ventes</th><th data-i18n="lbl_ca_generated">CA Généré</th><th data-i18n="th_action">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SYSTÈME -->
+<section id="config" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="system_title">Système <span>&amp; Données</span></h1></div>
+
+  <div class="config-grid">
+    <div class="config-block"><h4 data-i18n="local_backup">💾 Backup Local</h4><p data-i18n="lbl_optional_desc">Exporte en JSON (sauvegarde) ou CSV (Excel).</p><button class="btn btn-ghost btn-full" onclick="DataManager.downloadBackup()">📦 JSON (backup)</button><button class="btn btn-ghost btn-full" onclick="DataManager.downloadCSV()" style="margin-top:6px">📊 CSV (Excel)</button></div>
+    <div class="config-block">
+      <h4 data-i18n="restore">📥 Restaurer</h4>
+      <p style="font-size:.76rem;color:var(--text3);margin-bottom:10px" data-i18n="lbl_restore_desc">Importe un backup JSON pour restaurer toutes vos données.</p>
+      <input type="file" id="import-file" accept=".json" onchange="DataManager.importBackup(event)" style="display:none">
+      <button class="btn btn-ghost btn-full" onclick="document.getElementById('import-file').click()" data-i18n="btn_restore">
+        📂 Importer un backup
+      </button>
+    </div>
+    
+    <div class="config-block"><h4 data-i18n="danger_zone">🚨 Zone Danger</h4>
+      <p style="font-size:.76rem;color:var(--text3);margin-bottom:10px" data-i18n="danger_zone_desc">Ces actions sont irréversibles.</p>
+      <button class="btn btn-warning btn-full" style="margin-bottom:8px" onclick="DataManager.resetDataOnly()">🧹 <span data-i18n="btn_soft_reset">Effacer données commerciales</span></button>
+      <button class="btn btn-danger btn-full" onclick="DataManager.resetSystem()">🔥 <span data-i18n="reset">Réinitialisation totale</span></button>
+    </div>
+  </div>
+  <div class="card mt-14">
+    <div class="card-title" data-i18n="lbl_export_excel_reports">📊 Exporter les Rapports Excel</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+      <button class="btn btn-primary btn-full" onclick="ExcelExport.daily()">📅 <span data-i18n="lbl_daily_report">Rapport Journalier</span></button>
+      <button class="btn btn-primary btn-full" onclick="ExcelExport.monthly()">📆 <span data-i18n="lbl_monthly_report">Rapport Mensuel</span></button>
+      <button class="btn btn-primary btn-full" onclick="ExcelExport.annual()">📈 <span data-i18n="lbl_annual_report">Rapport Annuel</span></button>
+      <button class="btn btn-ghost btn-full" onclick="ExcelExport.stockReport()">📦 <span data-i18n="lbl_stock_report">Rapport Stock</span></button>
+      <button class="btn btn-ghost btn-full" onclick="ExcelExport.debtsReport()">💳 <span data-i18n="lbl_debts_report">Rapport Dettes</span></button>
+    </div>
+  </div>
+
+  <!-- Storage Preferences -->
+  <div class="card mt-14">
+    <div class="card-title" data-i18n="lbl_storage_prefs">💾 Préférences de Stockage</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label" data-i18n="lbl_export_prefix">Préfixe des fichiers exportés</label>
+      <input type="text" id="storage-prefix" placeholder="Ex: MonMagasin" maxlength="20">
+    </div>
+    <div style="font-size:.78rem;color:var(--text3);margin-bottom:10px;font-family:var(--fm)">
+      <span data-i18n="lbl_files_named">Les fichiers seront nommés :</span> <span id="storage-preview" style="color:var(--accent)">MonMagasin_Backup_2026.json</span>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="StorageConfig.savePrefs()" data-i18n="lbl_save_prefs">💾 Sauvegarder préférences</button>
+  </div>
+
+  <div class="card mt-14"><div class="card-title" data-i18n="lbl_system_info">Informations Système</div><div id="sys-info" style="display:grid;gap:8px;font-family:var(--fm);font-size:.76rem;color:var(--text2)"></div></div>
+</section>
+
+<!-- PARAMÈTRES -->
+<section id="settings" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="settings_title">⚙️ <span>Paramètres</span></h1></div>
+  <div class="settings-grid">
+    <div class="settings-section">
+      <h3 data-i18n="shop_identity">🏪 Identité du Commerce</h3>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label" data-i18n="lbl_shop_name">Nom du Commerce</label><input type="text" id="set-shop-name" maxlength="40"></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label" data-i18n="lbl_currency">Devise</label>
+        <select id="set-currency">
+          <option value="F">F CFA (F)</option><option value="€">Euro (€)</option>
+          <option value="$">Dollar ($)</option><option value="MAD">Dirham (MAD)</option>
+          <option value="XOF">XOF</option><option value="GHS">Cedi (GHS)</option><option value="NGN">Naira (₦)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label" data-i18n="lbl_phone">Téléphone</label><input type="tel" id="set-shop-phone" inputmode="tel"></div>
+      <button class="btn btn-primary btn-full" onclick="Settings.saveIdentity()" data-i18n="save">Sauvegarder</button>
+    </div>
+    <div class="settings-section">
+      <h3 data-i18n="language_section">🌍 Langue / Language</h3>
+      <p style="font-size:.78rem;color:var(--text3);margin-bottom:12px" data-i18n="lbl_language">Choisissez la langue de l'interface</p>
+      <div class="lang-tabs">
+        <div class="lang-tab active" id="lang-fr" onclick="Settings.setLang('fr')">🇫🇷 Français</div>
+        <div class="lang-tab" id="lang-en" onclick="Settings.setLang('en')">🇬🇧 English</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3 data-i18n="appearance">🎨 Apparence</h3>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="light_mode">Mode Clair</div><div class="toggle-desc">Thème blanc</div></div>
+        <label class="toggle"><input type="checkbox" id="set-light-mode" onchange="Settings.applyTheme()"><span class="toggle-slider"></span></label>
+      </div>
+      <div style="margin-top:14px">
+        <div class="form-label" style="margin-bottom:10px" data-i18n="accent_color">Couleur d'accent</div>
+        <div class="color-swatches">
+          <div class="swatch active" style="background:#00e87a" data-color="#00e87a" data-acc2="#00b85e" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#3b9eff" data-color="#3b9eff" data-acc2="#1a7de0" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#a855f7" data-color="#a855f7" data-acc2="#8b3fd8" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#f97316" data-color="#f97316" data-acc2="#d96010" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#ef4444" data-color="#ef4444" data-acc2="#cc2222" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#eab308" data-color="#eab308" data-acc2="#c99600" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#14b8a6" data-color="#14b8a6" data-acc2="#0d9488" onclick="Settings.setAccent(this)"></div>
+          <div class="swatch" style="background:#ec4899" data-color="#ec4899" data-acc2="#c42680" onclick="Settings.setAccent(this)"></div>
+        </div>
+      </div>
+      <div class="form-group mt-14"><label class="form-label" data-i18n="text_size">Taille du texte</label>
+        <select id="set-font-size" onchange="Settings.applyFontSize()">
+          <option value="14">Petit (14px)</option><option value="16" selected>Normal (16px)</option><option value="18">Grand (18px)</option>
+        </select>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3 data-i18n="cashier_behavior">🛒 Comportement Caisse</h3>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="set_confirm_sale">Confirmation avant vente</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-confirm-sale"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="set_warn_margin">Alerte marge négative</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-warn-margin" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="set_reset_qty">Reset quantité après vente</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-reset-qty" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-group mt-14"><label class="form-label" data-i18n="set_debt_threshold">Seuil alerte dettes</label><input type="number" id="set-debt-threshold" placeholder="10000" inputmode="numeric"></div>
+      <hr class="divider">
+      <div style="font-family:var(--fd);font-size:.82rem;font-weight:700;margin-bottom:10px" data-i18n="settings_eod">📊 Résumé Fin de Journée</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="set_eod_enabled">Activer le résumé automatique</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-eod-enabled" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-group mt-14" style="display:flex;gap:10px;align-items:flex-end">
+        <div style="flex:1">
+          <label class="form-label" data-i18n="settings_eod_time">Heure</label>
+          <input type="number" id="set-eod-hour" min="0" max="23" value="20" inputmode="numeric" style="text-align:center">
+        </div>
+        <div style="flex:1">
+          <label class="form-label">Minute</label>
+          <input type="number" id="set-eod-minute" min="0" max="59" value="0" inputmode="numeric" style="text-align:center">
+        </div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);padding-bottom:10px">ex: 20h00</div>
+      </div>
+      <button class="btn btn-primary btn-full mt-14" onclick="Settings.saveBehavior()" data-i18n="save">Sauvegarder</button>
+    </div>
+    <div class="settings-section admin-only">
+      <h3 data-i18n="settings_comm">💰 Commissions Vendeurs</h3>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label" data-i18n="settings_comm_enable">Activer les commissions</div>
+          <div class="toggle-desc"></div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="set-comm-enabled"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-group mt-14">
+        <label class="form-label" data-i18n="comm_base">Base de calcul</label>
+        <select id="set-comm-base">
+          <option value="profit" data-i18n="comm_base_profit">% du bénéfice brut (Prix vente - Prix achat)</option>
+          <option value="ca" data-i18n="comm_base_ca">% du chiffre d'affaires</option>
+        </select>
+      </div>
+      <div style="background:rgba(0,232,122,.06);border:1px solid var(--accent);border-radius:var(--rmd);padding:10px 12px;margin-top:10px;font-family:var(--fm);font-size:.7rem;color:var(--text2);line-height:1.7">
+        <strong data-i18n="lbl_recommended_option">Option recommandée :</strong> <span data-i18n="comm_base_profit">% du bénéfice brut</span><br>
+        Exemple : vendeur avec 10% de taux, vend un article à 1000F acheté 600F → bénéfice brut = 400F → commission = 40F
+      </div>
+      <button class="btn btn-primary btn-full mt-14" onclick="Settings.saveCommissions()" data-i18n="save">Sauvegarder</button>
+    </div>
+    <div class="settings-section">
+      <h3 data-i18n="auto_backup_section">💾 Sauvegarde</h3>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="set_auto_backup">Auto-backup activé</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-auto-backup" checked onchange="Settings.toggleAutoBackup()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label" data-i18n="lbl_backup_on_close">Backup à la fermeture</div><div class="toggle-desc"></div></div>
+        <label class="toggle"><input type="checkbox" id="set-backup-unload" checked><span class="toggle-slider"></span></label>
+      </div>
+      <hr class="divider">
+      <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3)">Dernier backup : <span id="last-backup-time" style="color:var(--text2)">—</span></div>
+      <button class="btn btn-ghost btn-full mt-14" onclick="DataManager.downloadBackup()">💾 Backup maintenant</button>
+    </div>
+    <div class="settings-section">
+      <h3 data-i18n="settings_pin">🔐 Modifier mon PIN</h3>
+      <div class="form-group" style="margin-bottom:11px">
+        <label class="form-label">PIN actuel</label>
+        <input type="password" id="pin-current" maxlength="4" inputmode="numeric" placeholder="••••">
+      </div>
+      <div class="form-group" style="margin-bottom:11px">
+        <label class="form-label" data-i18n="settings_pin_new">Nouveau PIN (4 chiffres)</label>
+        <input type="password" id="pin-new" maxlength="4" inputmode="numeric" placeholder="••••">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" data-i18n="settings_pin_confirm">Confirmer nouveau PIN</label>
+        <input type="password" id="pin-new2" maxlength="4" inputmode="numeric" placeholder="••••">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="PinManager.change()">🔐 <span data-i18n="settings_pin">Changer le PIN</span></button>
+    </div>
+
+    <div class="settings-section">
+      <h3>🤖 IA — <span data-i18n="lbl_barcode">Clé API</span> (Optionnel)</h3>
+      <div style="font-size:.78rem;color:var(--text2);margin-bottom:12px;line-height:1.6">
+        Connectez une IA externe gratuite pour des réponses encore plus intelligentes.<br>
+        <strong data-i18n="lbl_gemini_recommended">Recommandé : Google Gemini</strong> — gratuit sur <a href="https://aistudio.google.com" target="_blank" style="color:var(--accent)">aistudio.google.com</a>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label">Type d'IA</label>
+        <select id="ai-provider">
+          <option value="local" data-i18n="lbl_local_ai">IA locale intégrée (par défaut)</option>
+          <option value="gemini">Google Gemini (gratuit)</option>
+          <option value="groq">Groq — Llama 3 (gratuit)</option>
+          <option value="mistral">Mistral (gratuit limité)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label" data-i18n="lbl_api_key">Clé API</label>
+        <input type="password" id="ai-api-key" placeholder="AIza... ou gsk_...">
+      </div>
+      <div id="ai-key-status" style="font-family:var(--fm);font-size:.72rem;min-height:18px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-info btn-sm" onclick="AIConfig.test()" data-i18n="btn_test">🔌 Tester</button>
+        <button class="btn btn-primary btn-sm" onclick="AIConfig.save()" data-i18n="save">💾 Sauvegarder</button>
+        <button class="btn btn-ghost btn-sm" onclick="AIConfig.clear()" data-i18n="btn_delete">✕ Supprimer</button>
+      </div>
+      <hr class="divider">
+      <div style="font-size:.72rem;color:var(--text3);font-family:var(--fm)">
+        📋 <strong data-i18n="lbl_how_to_get_key">Comment obtenir une clé Gemini :</strong><br>
+        1. Aller sur aistudio.google.com<br>
+        2. "Get API Key" → "Create API Key"<br>
+        3. Copier la clé → la coller ici
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3 data-i18n="about">ℹ️ À Propos & Droits d'Auteur</h3>
+      <div style="font-family:var(--fm);font-size:.75rem;color:var(--text2);display:grid;gap:8px">
+        <div><span data-i18n="about_version">Version</span> : <span style="color:var(--accent)">Smart Market Pro v7.7</span></div>
+      <!-- Droits d'auteur -->
+      <div style="margin-top:14px;background:linear-gradient(135deg,rgba(0,232,122,.06),rgba(0,140,255,.04));border:1px solid var(--bord2);border-radius:var(--rlg);padding:16px 18px">
+        <div style="font-family:var(--fd);font-size:.95rem;font-weight:800;color:var(--accent);margin-bottom:8px">Smart Market Pro</div>
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--text2);line-height:1.9">
+          <div>© 2026 <strong style="color:var(--text)">EZE Jean Emmanuel</strong></div>
+          <div data-i18n="about_copyright">Tous droits réservés</div>
+          <div style="margin-top:6px;color:var(--text3)" data-i18n="lbl_about_desc">Application de gestion commerciale<br>conçue pour les commerçants africains</div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+            <span style="color:var(--text3)" data-i18n="about_version">Version</span> : <strong>v7.7 Enterprise</strong><br>
+            <span style="color:var(--text3)">Build :</span> <strong>20260527</strong><br>
+            <span style="color:var(--text3)" data-i18n="lbl_license">Licence :</span> <strong data-i18n="lbl_license_value">Propriétaire — Usage commercial réservé</strong>
+          </div>
+        </div>
+      </div>
+        <div><span data-i18n="about_master">Code Maître</span> : <span id="master-code-display" style="color:var(--accent);font-family:var(--fm);letter-spacing:2px;font-weight:700"></span>
+          <div style="font-size:.65rem;color:var(--text3);margin-top:4px"></div>
+        </div>
+      </div>
+      <hr class="divider">
+      <button id="pwa-install-btn" class="btn btn-info btn-full" onclick="PWA.install()" style="margin-bottom:8px">📲 Installer l'application</button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="EODSummary.show()" style="margin-bottom:8px">📊 <span data-i18n="eod_title">Voir résumé du jour</span></button>
+      <button class="btn btn-danger btn-full" onclick="Settings.resetSettings()" data-i18n="reset">Réinitialiser les paramètres</button>
+    </div>
+  </div>
+</section>
+
+<!-- IA ASSISTANT -->
+<section id="ai" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="ai_title">🤖 <span>IA Assistant</span></h1>
+    <span style="font-family:var(--fm);font-size:.65rem;color:var(--text3);background:var(--sur2);border:1px solid var(--border);border-radius:4px;padding:2px 8px">Analyse locale + Claude API</span>
+  </div>
+  <div class="card" id="ai-summary-card">
+    <div class="card-title">📊 Analyse Automatique du Commerce</div>
+    <div id="ai-summary-content" style="font-size:.84rem;color:var(--text2);line-height:1.7;min-height:60px">
+      <span style="color:var(--text3);font-family:var(--fm)" data-i18n="ai_click_generate">Cliquez sur "Générer" pour obtenir votre analyse...</span>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="AIAdvanced.generateSummary()" id="btn-ai-summary" data-i18n="ai_generate">✨ Générer l'analyse</button>
+  </div>
+  <div class="card">
+    <div class="card-title">💬 Assistant Conversationnel</div>
+    <div id="ai-chat" style="min-height:200px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding:4px 0">
+      <div class="ai-msg ai-msg-bot"><div class="ai-msg-content" data-i18n="ai_welcome_msg">Bonjour ! Je connais toutes vos données : ventes, stock, dettes, performances. Posez-moi n'importe quelle question sur votre commerce. 🚀</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="ai-input" placeholder="Ex: Quel est mon produit le plus rentable ?" style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter')AI.send()">
+      <button class="btn btn-primary" onclick="AIAdvanced.send()" id="btn-ai-send">Envoyer</button>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="AIAdvanced.quick('Bilan du jour')">📅 Bilan jour</button>
+      <button class="btn btn-ghost btn-sm" onclick="AIAdvanced.quick('Stock urgent à réapprovisionner')">📦 Stock urgent</button>
+      <button class="btn btn-ghost btn-sm" onclick="AIAdvanced.quick('Meilleur vendeur')">🏆 Top vendeur</button>
+      <button class="btn btn-ghost btn-sm" onclick="AIAdvanced.quick('Analyse mes dettes clients')">💳 Dettes</button>
+      <button class="btn btn-ghost btn-sm" onclick="AIAdvanced.quick('Recommandations pour augmenter mon chiffre d affaires')">📈 Conseils</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="ai_anomalies">🔍 Anomalies Détectées</div>
+    <div id="ai-anomalies"><span style="color:var(--text3);font-family:var(--fm);font-size:.8rem" data-i18n="ai_click_detect">Cliquez sur "Générer l'analyse" pour détecter les anomalies.</span></div>
+  </div>
+</section>
+
+
+<!-- FOURNISSEURS -->
+<section id="suppliers" class="page">
+  <div class="page-header"><h1 class="page-title"><span data-i18n="nav_suppliers">Fournisseurs</span></h1></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--info)"><div class="stat-label" data-i18n="nav_suppliers">Fournisseurs</div><div class="stat-value" id="sup-count">0</div></div>
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" data-i18n="lbl_total_purchases">Total Achats</div><div class="stat-value" id="sup-total-spent">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_add_supplier">Ajouter un Fournisseur</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label" data-i18n="lbl_name_star">Nom *</label><input type="text" id="sup-name" placeholder="Ex: Grossiste ABC"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_phone">Téléphone</label><input type="tel" id="sup-phone" placeholder="+229 XX XX XX" inputmode="tel"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_contact_email">Contact / Email</label><input type="text" id="sup-contact" placeholder="contact@fournisseur.com"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_notes">Notes</label><input type="text" id="sup-notes" placeholder="Conditions, délais..." data-i18n-placeholder="ph_supplier_notes"></div>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="Suppliers.add()" data-i18n="lbl_add_supplier_btn">+ AJOUTER LE FOURNISSEUR</button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_suppliers_list">Liste des Fournisseurs</div>
+    <div class="table-wrap">
+      <table id="tableSuppliers">
+        <thead><tr><th data-i18n="lbl_name">Nom</th><th data-i18n="lbl_phone">Téléphone</th><th data-i18n="lbl_contact">Contact</th><th data-i18n="lbl_orders">Commandes</th><th data-i18n="lbl_total_spent">Total Dépensé</th><th data-i18n="lbl_last_purchase">Dernier Achat</th><th data-i18n="th_action">Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CATÉGORIES -->
+<section id="categories" class="page">
+  <div class="page-header"><h1 class="page-title"><span data-i18n="nav_categories">Catégories</span></h1></div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_add_category">Ajouter une Catégorie</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="cat-name" placeholder="Ex: Électronique" style="flex:1;min-width:180px">
+      <button class="btn btn-primary" onclick="Categories.add(document.getElementById('cat-name').value);document.getElementById('cat-name').value=''">+ <span data-i18n="btn_add">Ajouter</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_available_categories">Catégories Disponibles</div>
+    <div class="table-wrap">
+      <table id="tableCat">
+        <thead><tr><th data-i18n="lbl_category">Catégorie</th><th data-i18n="lbl_products">Produits</th><th data-i18n="th_action">Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- RETOURS -->
+<section id="returns" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="returns_title">↩️ <span>Retours Clients</span></h1></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--danger)"><div class="stat-label" data-i18n="lbl_amount_returned">Montant Retourné</div><div class="stat-value" id="returns-total">0</div></div>
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" data-i18n="lbl_returns_count">Nb Retours</div><div class="stat-value" id="returns-count">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_how_to_return">Pour enregistrer un retour</div>
+    <p style="font-size:.82rem;color:var(--text2);margin-bottom:10px" data-i18n="returns_instruction">Allez dans <strong>Ventes → Transactions du Jour</strong> et cliquez sur le bouton <strong>↩️</strong> à côté de la vente à retourner.</p>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_returns_history">Historique des Retours</div>
+    <div class="table-wrap">
+      <table id="tableReturns">
+        <thead><tr><th data-i18n="lbl_date">Date</th><th data-i18n="th_product">Produit</th><th data-i18n="lbl_qty">Quantité</th><th data-i18n="lbl_amount">Montant</th><th data-i18n="lbl_client">Client</th><th data-i18n="th_status">Statut</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FIDÉLITÉ -->
+<section id="loyalty" class="page">
+  <div class="page-header"><h1 class="page-title" data-i18n="loyalty_title">⭐ <span>Programme Fidélité</span></h1></div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--warning)"><div class="stat-label" data-i18n="lbl_total_points">Total Points</div><div class="stat-value" id="loyalty-total-points">0</div><div class="stat-sub" data-i18n="lbl_all_clients">Tous clients</div></div>
+    <div class="stat-card" style="--accent-color:var(--accent)"><div class="stat-label" data-i18n="lbl_loyal_clients">Clients Fidèles</div><div class="stat-value" id="loyalty-clients">0</div></div>
+  </div>
+  <div class="card">
+    <div style="font-size:.82rem;color:var(--text2);line-height:1.6">
+      <strong data-i18n="loyalty_rule_label">Règle :</strong> <span data-i18n="loyalty_rule_text">1 point pour chaque 100</span> <span id="loyalty-curr"></span> <span data-i18n="loyalty_spent">dépensés</span><br>
+      🥉 Bronze (0-199 pts) : 2% remise | 🥈 Silver (200-499 pts) : 5% remise | 🥇 Gold (500+ pts) : 10% remise<br>
+      <em data-i18n="loyalty_auto_note">Les points sont attribués automatiquement à chaque vente avec nom du client.</em>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="loyalty_ranking_title">Classement Clients Fidèles</div>
+    <div class="table-wrap">
+      <table id="tableLoyalty">
+        <thead><tr><th>Client</th><th>Points</th><th>Niveau</th><th>Remise</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIFS -->
+<section id="objectives" class="page">
+  <div class="page-header"><h1 class="page-title"><span data-i18n="nav_objectives">Objectifs de Vente</span></h1></div>
+  <div class="card">
+    <div class="card-title" data-i18n="obj_define_title">Définir les Objectifs</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Objectif Journalier</label>
+        <input type="number" id="obj-daily" inputmode="decimal" placeholder="Ex: 50000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Objectif Mensuel</label>
+        <input type="number" id="obj-monthly" inputmode="decimal" placeholder="Ex: 1500000">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="Objectives.setDaily()">💾 Enregistrer journalier</button>
+      <button class="btn btn-primary" onclick="Objectives.setMonthly()">💾 Enregistrer mensuel</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Progression</div>
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:.82rem;font-weight:700">Objectif Journalier</span>
+        <span style="font-family:var(--fm);font-size:.78rem;color:var(--accent)" id="obj-daily-pct">0%</span>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:12px;overflow:hidden">
+        <div id="obj-daily-bar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .6s ease"></div>
+      </div>
+      <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);margin-top:4px" id="obj-daily-val">0 / 0</div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:.82rem;font-weight:700">Objectif Mensuel</span>
+        <span style="font-family:var(--fm);font-size:.78rem;color:var(--info)" id="obj-monthly-pct">0%</span>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:12px;overflow:hidden">
+        <div id="obj-monthly-bar" style="height:100%;width:0%;background:var(--info);border-radius:4px;transition:width .6s ease"></div>
+      </div>
+      <div style="font-family:var(--fm);font-size:.72rem;color:var(--text3);margin-top:4px" id="obj-monthly-val">0 / 0</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- IMPORT & ANALYSE IA -->
+<section id="bizimport" class="page">
+  <div class="page-header">
+    <h1 class="page-title"><span data-i18n="nav_bizimport">Import &amp; Analyse IA</span></h1>
+  </div>
+  <div class="card" style="border-left:3px solid var(--accent)">
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="font-size:1.6rem;flex-shrink:0">🤖</div>
+      <div>
+        <div style="font-family:var(--fd);font-weight:700;font-size:.88rem;margin-bottom:4px" data-i18n="biz_analyzer_title">Analyseur de Données Business</div>
+        <div style="font-size:.8rem;color:var(--text2);line-height:1.6" data-i18n="biz_analyzer_desc">Importez vos données depuis <strong>Excel, CSV ou JSON</strong>. L'IA détecte automatiquement la structure et génère une analyse complète.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="biz_step1_title">📁 Étape 1 — Importer votre fichier</div>
+    <label class="btn btn-primary btn-full" style="cursor:pointer;flex-direction:column;gap:6px;padding:22px">
+      <span style="font-size:1.6rem">📂</span>
+      <span data-i18n="biz_select_file">Sélectionner un fichier</span>
+      <span style="font-size:.7rem;opacity:.7">CSV • JSON • TXT</span>
+      <input type="file" id="biz-import-file" accept=".csv,.json,.txt" onchange="BizImport.loadFile(event)" style="display:none">
+    </label>
+    <div id="biz-file-info" style="margin-top:10px;font-family:var(--fm);font-size:.75rem;color:var(--text3);text-align:center"></div>
+  </div>
+  <div class="card" id="biz-mapping-card" style="display:none">
+    <div class="card-title" data-i18n="biz_step2_title">🔧 Étape 2 — Correspondance des colonnes</div>
+    <div style="font-size:.8rem;color:var(--text2);margin-bottom:14px" data-i18n="biz_step2_desc">L'IA a détecté la structure. Vérifiez les correspondances :</div>
+    <div class="form-grid" id="biz-mapping-fields"></div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="BizImport.analyze()">🤖 Analyser avec l'IA</button>
+      <button class="btn btn-ghost" onclick="BizImport.reset()">✕ Annuler</button>
+    </div>
+  </div>
+  <div class="card" id="biz-results-card" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0" data-i18n="biz_ai_results">🤖 Résultats Analyse IA</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="BizImport.importToApp()" data-i18n="biz_integrate_btn">📥 Intégrer dans l'app</button>
+        <button class="btn btn-ghost btn-sm" onclick="BizImport.exportAnalysis()">📊 Exporter</button>
+      </div>
+    </div>
+    <div id="biz-analysis-content"></div>
+  </div>
+  <div class="card" id="biz-chat-card" style="display:none">
+    <div class="card-title" data-i18n="biz_chat_title">💬 Questions sur vos données importées</div>
+    <div id="biz-chat" style="min-height:120px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="biz-chat-input" placeholder="Ex: Quel mois a été le meilleur ?" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')BizImport.chat()">
+      <button class="btn btn-primary" onclick="BizImport.chat()">Envoyer</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- DÉPENSES -->
+<section id="expenses" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="expenses_title">💸 <span>Dépenses</span></h1>
+    <button class="btn btn-info btn-sm" onclick="ExcelExport.expensesReport()">📊 Export</button>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--danger)">
+      <div class="stat-label" data-i18n="exp_month_label">Dépenses du Mois</div>
+      <div class="stat-value" id="exp-month">0</div>
+      <div class="stat-sub" data-i18n="exp_current_month">Mois en cours</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--warning)">
+      <div class="stat-label" data-i18n="exp_total_label">Total Dépenses</div>
+      <div class="stat-value" id="exp-total">0</div>
+      <div class="stat-sub" data-i18n="exp_all_periods">Toutes périodes</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--accent)">
+      <div class="stat-label" data-i18n="exp_net_profit_label">Bénéfice Net Réel</div>
+      <div class="stat-value" id="exp-net">0</div>
+      <div class="stat-sub" data-i18n="exp_net_formula">CA - Achats - Dépenses</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--info)">
+      <div class="stat-label" data-i18n="exp_trend_label">Évolution Mensuelle</div>
+      <div class="stat-value" id="exp-trend">—</div>
+      <div class="stat-sub" data-i18n="exp_vs_previous">vs mois précédent</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="exp_record_title">Enregistrer une Dépense</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_description_req">Description *</label>
+        <input type="text" id="exp-desc" placeholder="Ex: Loyer boutique, Transport...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_amount_req">Montant *</label>
+        <input type="number" id="exp-amount" inputmode="decimal" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_category">Catégorie</label>
+        <select id="exp-cat">
+          <option value="Loyer" data-i18n="exp_cat_rent">🏠 Loyer / Local</option>
+          <option value="Transport" data-i18n="exp_cat_transport">🚗 Transport / Livraison</option>
+          <option value="Salaires" data-i18n="exp_cat_salaries">👥 Salaires / Commissions</option>
+          <option value="Electricite" data-i18n="exp_cat_electricity">💡 Électricité / Eau</option>
+          <option value="Telephone" data-i18n="exp_cat_phone">📱 Téléphone / Internet</option>
+          <option value="Achat stock" data-i18n="exp_cat_stock">📦 Achat de stock</option>
+          <option value="Entretien" data-i18n="exp_cat_maintenance">🔧 Entretien / Réparation</option>
+          <option value="Impots" data-i18n="exp_cat_taxes">📋 Impôts / Taxes</option>
+          <option value="Marketing" data-i18n="exp_cat_marketing">📣 Marketing / Pub</option>
+          <option value="Autre" data-i18n="lbl_other">📌 Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" id="exp-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optionnel)</label>
+        <input type="text" id="exp-notes" placeholder="Détails supplémentaires...">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="Expenses.add()" data-i18n="exp_save_btn">+ ENREGISTRER LA DÉPENSE</button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="exp_history_title">Historique des Dépenses</div>
+    <div class="table-wrap">
+      <table id="tableExpenses">
+        <thead>
+          <tr>
+            <th data-i18n="lbl_date">Date</th><th data-i18n="lbl_description">Description</th><th data-i18n="lbl_category">Catégorie</th>
+            <th data-i18n="lbl_amount">Montant</th><th data-i18n="lbl_by">Par</th><th data-i18n="th_action">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- RAPPORT DE CAISSE -->
+<section id="cashreport" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="cash_title">🏦 <span>Rapport Caisse</span></h1>
+    <button class="btn btn-info btn-sm" onclick="Printer.printCashReport()">🖨️ <span data-i18n="btn_print">Imprimer</span></button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="cr_closing_title">Clôture de Caisse</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:14px;line-height:1.6" data-i18n="cr_instructions">
+      Comptez l'argent physiquement dans votre caisse, entrez le montant ci-dessous.
+      L'app calcule automatiquement les écarts avec la caisse théorique.
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" data-i18n="cr_opening_fund">Fond de caisse (ouverture)</label>
+        <input type="number" id="cr-fond" inputmode="decimal"
+          placeholder="Montant au début de la journée" data-i18n-placeholder="ph_amount_day_start">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="cr_counted_amount">Montant compté maintenant</label>
+        <input type="number" id="cr-counted" inputmode="decimal"
+          placeholder="Argent dans la caisse en ce moment" data-i18n-placeholder="ph_cash_now">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-14" onclick="CashReport.calculate()">
+      📊 <span data-i18n="lbl_calc_report">Calculer le rapport</span>
+    </button>
+  </div>
+  <div class="card" id="cr-result-card" style="display:none">
+    <div class="card-title" data-i18n="cr_result_title">📋 Résultat de Clôture</div>
+    <div id="cr-result-content"></div>
+  </div>
+</section>
+
+<!-- COMMISSIONS VENDEURS -->
+<section id="commissions" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="comm_title">💰 <span>Commissions</span></h1>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_comm_rate_title">Taux de Commission par Vendeur (%)</div>
+    <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px;line-height:1.6" data-i18n="lbl_comm_explain">
+      Pourcentage du CA que chaque vendeur reçoit. Exemple : 5% = le vendeur reçoit
+      5% du total de tout ce qu'il vend ce mois.
+    </div>
+    <div id="commissions-config" style="display:flex;flex-direction:column;gap:10px"></div>
+    <button class="btn btn-primary mt-14" onclick="Commissions.saveRates()">
+      💾 <span data-i18n="lbl_save_rates">Sauvegarder les taux</span>
+    </button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_comm_current_month">Commissions — Mois en Cours</div>
+    <div class="table-wrap">
+      <table id="tableCommissions">
+        <thead>
+          <tr>
+            <th data-i18n="th_seller">Vendeur</th><th data-i18n="th_ca">CA</th><th data-i18n="th_calc_base">Base calcul</th><th data-i18n="th_rate">Taux</th>
+            <th data-i18n="th_commission">Commission</th><th data-i18n="th_status">Statut</th><th data-i18n="th_action">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- HISTORIQUE COMPLET -->
+<section id="history" class="page">
+  <div class="page-header">
+    <h1 class="page-title" data-i18n="history_title">📋 <span>Historique</span></h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-danger btn-sm" id="hist-delete-sel-btn" onclick="History.deleteSelected()" style="display:none">🗑️ <span data-i18n="lbl_delete_selection">Supprimer la sélection</span> (<span id="hist-sel-count">0</span>)</button>
+      <button class="btn btn-info btn-sm" onclick="ExcelExport.historyReport()">📊 <span data-i18n="btn_export">Export</span></button>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="card" style="padding:14px 16px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" data-i18n="lbl_period">Période</label>
+        <select id="hist-period" onchange="History.render()">
+          <option value="all" data-i18n="lbl_all">Tout</option>
+          <option value="today" data-i18n="period_today">Aujourd'hui</option>
+          <option value="week" data-i18n="period_7days">7 derniers jours</option>
+          <option value="month" selected data-i18n="lbl_this_month">Ce mois</option>
+          <option value="year" data-i18n="lbl_this_year">Cette année</option>
+          <option value="custom" data-i18n="lbl_custom_dates">Dates personnalisées</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0" id="hist-date-from-wrap" style="display:none">
+        <label class="form-label" data-i18n="lbl_from">Du</label>
+        <input type="date" id="hist-date-from" onchange="History.render()">
+      </div>
+      <div class="form-group" style="margin-bottom:0" id="hist-date-to-wrap" style="display:none">
+        <label class="form-label" data-i18n="lbl_to">Au</label>
+        <input type="date" id="hist-date-to" onchange="History.render()">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" data-i18n="th_seller">Vendeur</label>
+        <select id="hist-seller" onchange="History.render()">
+          <option value="" data-i18n="lbl_all">Tous</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" data-i18n="lbl_search">Recherche</label>
+        <input type="search" id="hist-search" placeholder="Produit, client..." data-i18n-placeholder="ph_product_client" oninput="History.render()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats filtrées -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent-color:var(--info)">
+      <div class="stat-label" data-i18n="nav_sales">Ventes</div>
+      <div class="stat-value" id="hist-count">0</div>
+      <div class="stat-sub" data-i18n="lbl_transactions">Transactions</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--accent)">
+      <div class="stat-label" data-i18n="lbl_ca_total">CA Total</div>
+      <div class="stat-value" id="hist-ca">0</div>
+      <div class="stat-sub" id="hist-ca-sub" data-i18n="lbl_revenue_total">Chiffre d'affaires</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--warning)">
+      <div class="stat-label" data-i18n="lbl_profit">Profit</div>
+      <div class="stat-value" id="hist-profit">0</div>
+      <div class="stat-sub" id="hist-margin-sub" data-i18n="lbl_margin">Marge</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--danger)">
+      <div class="stat-label" data-i18n="nav_debts_full">Dettes</div>
+      <div class="stat-value" id="hist-debt">0</div>
+      <div class="stat-sub" data-i18n="lbl_uncollected">Non encaissé</div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card">
+    <div class="card-title" data-i18n="lbl_transactions">Transactions</div>
+    <div class="table-wrap">
+      <table id="tableHistory">
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" class="row-check" id="hist-check-all" onchange="History.toggleAll(this.checked)"></th>
+            <th data-i18n="lbl_date">Date</th><th data-i18n="th_product">Produit</th><th data-i18n="th_qty">Qté</th>
+            <th data-i18n="th_total">Total</th><th data-i18n="lbl_profit">Profit</th><th data-i18n="lbl_client">Client</th>
+            <th data-i18n="th_seller">Vendeur</th><th data-i18n="th_debt_short">Dette</th><th data-i18n="th_action">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="hist-pagination" style="display:flex;justify-content:center;align-items:center;gap:10px;padding:14px 0;flex-wrap:wrap"></div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<!-- MODE VENDEUR SIMPLIFIÉ -->
+<!-- CSS Mode Vendeur Simplifié -->
+
+<!-- SELLER MODE OVERLAY -->
+<div id="seller-mode-overlay">
+  <!-- Header -->
+  <div class="sm-header">
+    <div class="sm-header-info">
+      <div class="sm-shop" id="sm-shop-name">Smart Market Pro</div>
+      <div class="sm-seller" id="sm-seller-name" data-i18n="role_seller">Vendeur</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div id="sm-total-header" style="font-family:var(--fd);font-weight:800;font-size:.95rem;color:var(--accent);display:none"></div>
+      <button onclick="SellerMode.deactivate()" class="btn btn-ghost btn-sm" style="font-size:.75rem;padding:5px 10px">✕ <span data-i18n="sm_exit">Quitter</span></button>
+    </div>
+  </div>
+
+  <!-- Corps -->
+  <div class="sm-body">
+    <!-- Panel produits -->
+    <div class="sm-products-panel" id="sm-products-panel">
+      <div class="sm-products-hint" data-i18n="sm_tap_to_add">Touchez un produit pour l'ajouter</div>
+      <div id="sm-products-grid"></div>
+    </div>
+
+    <!-- Panel panier -->
+    <div class="sm-cart-panel" id="sm-cart-panel">
+      <div class="sm-cart-header">
+        <span class="sm-cart-title" data-i18n="sm_cart_title">Panier</span>
+        <span id="sm-cart-count"></span>
+      </div>
+      <div id="sm-cart"></div>
+      <div class="sm-cart-footer">
+        <input type="text" id="sm-client" placeholder="Nom du client (optionnel)" data-i18n-placeholder="ph_client"
+          style="margin-bottom:8px;font-size:.82rem">
+        <input type="number" id="sm-paid" inputmode="decimal"
+          placeholder="Montant payé (vide = tout payé)" data-i18n-placeholder="sm_paid_placeholder"
+          style="margin-bottom:8px;font-size:.82rem"
+          oninput="SellerMode.onPaidInput()">
+        <div id="sm-change-info" class="sm-change-info"></div>
+        <div class="sm-total-row">
+          <span class="sm-total-label" data-i18n="sm_total_label">TOTAL</span>
+          <span class="sm-total-val" id="sm-total">0 F</span>
+        </div>
+        <button id="sm-validate-btn" class="btn btn-primary btn-full"
+          onclick="SellerMode.validate()" disabled style="padding:14px;font-size:.9rem">
+          ✅ <span data-i18n="sm_validate_sale">VALIDER LA VENTE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglets mobile (bas) -->
+  <div class="sm-mob-tabs">
+    <button class="sm-mob-tab active" id="sm-tab-products" onclick="SellerMode.mobTab('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span data-i18n="sm_products_tab">Produits</span>
+    </button>
+    <button class="sm-mob-tab" id="sm-tab-cart" onclick="SellerMode.mobTab('cart')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span data-i18n="sm_cart_title">Panier</span>
+      <span class="sm-mob-tab-badge" id="sm-tab-cart-badge"></span>
+    </button>
+  </div>
+
+  <!-- Flash succès -->
+  <div id="sm-success">
+    <div style="font-size:3.5rem">✅</div>
+    <div style="font-family:var(--fd);font-size:1.6rem;font-weight:800;color:#000" data-i18n="sm_sale_recorded">Vente enregistrée !</div>
+    <div style="font-family:var(--fd);font-size:2.2rem;font-weight:800;color:#000" id="sm-success-amount"></div>
+    <div style="font-family:var(--fm);font-size:.8rem;color:rgba(0,0,0,.6)" id="sm-success-change"></div>
+  </div>
+</div>
+
+
+
+<!-- BOT NAV -->
+<nav id="bot-nav">
+  <button class="bot-tab active" id="btab-dashboard" onclick="UI.switchTab('dashboard')"><span class="bot-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Accueil</button>
+  <button class="bot-tab"        id="btab-sales"     onclick="UI.switchTab('sales')"><span class="bot-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>Ventes</button>
+  <button class="bot-tab"        id="btab-stock"     onclick="UI.switchTab('stock')" style="position:relative"><span class="bot-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>Stock<span id="stock-alert-badge" style="display:none;position:absolute;top:4px;right:6px;background:var(--danger);color:#fff;border-radius:10px;font-size:.55rem;font-family:var(--fm);font-weight:700;padding:1px 4px;line-height:1.4;min-width:14px;text-align:center"></span></button>
+  <button class="bot-tab admin-only" id="btab-analytics" onclick="UI.switchTab('analytics')"><span class="bot-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>Analyses</button>
+  <button class="bot-tab admin-only" id="btab-more"   onclick="MobNav.openDrawer()"><span class="bot-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>Plus</button>
+</nav>
+
+<footer id="app-footer">Smart Market Pro v7.7 Enterprise &nbsp;|&nbsp; © 2026 <strong style="color:var(--accent)">EZE Jean Emmanuel</strong> &nbsp;|&nbsp; <span data-i18n="footer_rights">Tous droits réservés</span></footer>
+
+<script src="js/core/utils.js"></script>
+<script src="js/core/i18n.js"></script>
+<script src="js/core/ui.js"></script>
+<script src="js/modules/sales.js"></script>
+<script src="js/modules/stock.js"></script>
+<script src="js/modules/analytics.js"></script>
+<script src="js/modules/alerts.js"></script>
+<script src="js/modules/debts.js"></script>
+<script src="js/modules/pinmanager.js"></script>
+<script src="js/modules/users.js"></script>
+<script src="js/modules/excelexport.js"></script>
+<script src="js/modules/datamanager.js"></script>
+<script src="js/modules/sysinfo.js"></script>
+<script src="js/modules/printer.js"></script>
+<script src="js/modules/aiadvanced.js"></script>
+<script src="js/modules/categories.js"></script>
+<script src="js/modules/suppliers.js"></script>
+<script src="js/modules/returns.js"></script>
+<script src="js/modules/loyalty.js"></script>
+<script src="js/modules/objectives.js"></script>
+<script src="js/modules/share.js"></script>
+<script src="js/modules/restockreport.js"></script>
+<script src="js/modules/storageconfig.js"></script>
+<script src="js/modules/bizimport.js"></script>
+<script src="js/modules/aiconfig.js"></script>
+<script src="js/modules/deferredsales.js"></script>
+<script src="js/modules/sellerdash.js"></script>
+<script src="js/modules/eodsummary.js"></script>
+<script src="js/modules/history.js"></script>
+<script src="js/modules/expenses.js"></script>
+<script src="js/modules/cashreport.js"></script>
+<script src="js/modules/commissions.js"></script>
+<script src="js/modules/sellermode.js"></script>
+<script src="js/modules/recoverymanager.js"></script>
+<script src="js/modules/guide.js"></script>
+<script src="js/modules/dashboard.js"></script>
+<script src="js/core/settings.js"></script>
+<script src="js/modules/autobackup.js"></script>
+<script src="js/core/db.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/pwa.js"></script>
+<script src="js/core/mobnav.js"></script>
+<script src="js/core/onboarding.js"></script>
+<script src="js/core/smpmodal.js"></script>
+<script src="js/core/navdesktop.js"></script>
+<script src="js/core/app-init.js"></script>
+</body>
+</html>
