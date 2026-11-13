@@ -54,11 +54,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, {passive:true});
   });
 
-  // 8. Démarrage — Version hors ligne : PIN local direct
-  await Auth.ensureDefaultAdmin();
-  Auth.renderAccountsList();
-  const ov = document.getElementById('auth-overlay');
-  if (ov) ov.style.display = 'flex';
+  // 8. Démarrage — compte cloud d'abord, puis PIN local (géré par CloudAuth)
+  await CloudAuth.start();
 
-  console.log('[SMP v7.7 Free] ✅ Smart Market Pro démarré (hors ligne)');
+  console.log('[SMP PRO] ✅ Smart Market Pro démarré');
 });
