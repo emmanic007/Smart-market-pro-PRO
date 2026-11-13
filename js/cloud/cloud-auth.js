@@ -38,12 +38,15 @@ const CloudAuth = {
       document.head.appendChild(s);
     });
   },
-  async _initClient() {
-    if (this.client) return true;
-    if (!(await this._loadLib())) return false;
-    this.client = window.supabase.createClient(CLOUD_CONFIG.url, CLOUD_CONFIG.key,
-      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
-    return true;
+  _initClient() {
+    if (this.client) return Promise.resolve(true);
+    if (!this._initP) this._initP = this._loadLib().then(ok => {
+      if (ok) this.client = window.supabase.createClient(CLOUD_CONFIG.url, CLOUD_CONFIG.key,
+        { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+      else this._initP = null;           // nouvelle tentative possible plus tard
+      return ok;
+    });
+    return this._initP;
   },
   async _checkSession() {      // en arrière-plan : la session cloud est-elle encore valide ?
     if (!navigator.onLine) return;
@@ -133,6 +136,7 @@ const CloudAuth = {
     this._entered = true;
     this._hide();
     this._badge();
+    if (this.ctx && this.ctx.shopId) this._initClient().then(ok => { if (ok) Sync.start(); });
     Auth.ensureDefaultAdmin().then(() => {
       Auth.renderAccountsList();
       const ov = document.getElementById('auth-overlay');
@@ -140,7 +144,9 @@ const CloudAuth = {
     });
   },
   async signOut() {
-    if (!confirm('Se déconnecter du compte cloud ?\nLes données restent sur cet appareil.')) return;
+    if (navigator.onLine && window.Sync && Sync.ready()) { try { await Sync.now(); } catch (e) {} }
+    const n = window.Sync && Sync.ready() ? Sync.pendingCount() : 0;
+    if (!confirm('Se déconnecter du compte cloud ?\n' + (n ? n + ' modification(s) pas encore envoyée(s) restent sur cet appareil.\n' : '') + 'Les données restent sur cet appareil.')) return;
     try { if (this.client) await this.client.auth.signOut({ scope: 'local' }); } catch (e) {}
     try { localStorage.removeItem(this.CTX_KEY); } catch (e) {}
     location.reload();
