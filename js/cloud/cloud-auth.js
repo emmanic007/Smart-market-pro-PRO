@@ -9,6 +9,8 @@ const CloudAuth = {
   /* ---------- Démarrage ---------- */
   async start() {
     this._buildDom();
+    const rec = this._recoveryParams();            // l'utilisateur arrive depuis le lien reçu par email
+    if (rec) return this._startRecovery(rec);
     this.ctx = this._loadCtx();
     const stored = this._storedUser();
     if (this.ctx && stored && this.ctx.userId === stored.id) {   // appareil déjà configuré : ouverture immédiate
@@ -55,6 +57,51 @@ const CloudAuth = {
       if (r && r.data && r.data.session) { this.needsRelogin = false; this._loadShop(); }
       else { this.needsRelogin = true; console.warn('[Cloud] session expirée : reconnexion nécessaire'); }
     } catch (e) {}
+  },
+
+  /* ---------- Mot de passe oublié ---------- */
+  _recoveryParams() {
+    const p = new URLSearchParams((window.__SMP_BOOT_HASH || '').replace(/^#/, ''));
+    if (p.get('type') === 'recovery' && p.get('access_token')) return { at: p.get('access_token'), rt: p.get('refresh_token') || '' };
+    if (p.get('error')) return { error: true };
+    return null;
+  },
+  async _startRecovery(rec) {
+    history.replaceState(null, '', location.pathname + location.search);   // efface les clés de l'adresse
+    const expired = 'Lien invalide ou expiré. Demandez un nouveau lien avec « Mot de passe oublié ? ».';
+    if (!(await this._initClient())) return this._show('login', 'Connexion internet requise.');
+    if (rec.error) return this._show('login', expired);
+    const { error } = await this.client.auth.setSession({ access_token: rec.at, refresh_token: rec.rt });
+    if (error) return this._show('login', expired);
+    this._show('newpass');
+  },
+  showForgot() { const e = document.getElementById('cloud-email').value; this._show('forgot'); document.getElementById('cloud-email2').value = e; },
+  showLogin() { this._show('login'); },
+  async sendReset() {
+    const email = document.getElementById('cloud-email2').value.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return this._msg('Entrez votre email.');
+    if (!this.client && !(await this._initClient())) return this._msg('Connexion internet requise.');
+    this._busy(true);
+    try {
+      const { error } = await this.client.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if (error) throw error;
+      this._msg('Si cet email a un compte, un lien vient d\'être envoyé. Vérifiez aussi les courriers indésirables.', true);
+    } catch (e) { this._msg(this._err(e)); }
+    this._busy(false);
+  },
+  async savePassword() {
+    const a = document.getElementById('cloud-np1').value, b = document.getElementById('cloud-np2').value;
+    if (a.length < 6) return this._msg('6 caractères minimum.');
+    if (a !== b) return this._msg('Les deux mots de passe ne correspondent pas.');
+    this._busy(true);
+    try {
+      const { error } = await this.client.auth.updateUser({ password: a });
+      if (error) throw error;
+      const { data } = await this.client.auth.getSession();
+      this.user = data.session.user;
+      await this._afterAuth();
+    } catch (e) { this._msg(this._err(e)); }
+    this._busy(false);
   },
 
   /* ---------- Stockage local ---------- */
@@ -179,7 +226,8 @@ const CloudAuth = {
     if (/invalid login/i.test(m)) return 'Email ou mot de passe incorrect.';
     if (/already registered/i.test(m)) return 'Cet email a déjà un compte. Utilisez « Connexion ».';
     if (/fetch|network|failed/i.test(m)) return 'Pas de connexion internet.';
-    if (/rate limit/i.test(m)) return 'Trop de tentatives. Patientez un instant.';
+    if (/rate limit|security purposes|only request this after/i.test(m)) return 'Trop de demandes. Patientez une minute puis réessayez.';
+    if (/same password|different from the old/i.test(m)) return 'Choisissez un mot de passe différent de l\'ancien.';
     return m || 'Erreur inconnue.';
   },
   _msg(t, ok) { const el = document.getElementById('cloud-msg'); el.textContent = t || ''; el.className = 'cloud-msg' + (ok ? ' ok' : ''); },
@@ -187,8 +235,7 @@ const CloudAuth = {
   _show(step, msg) {
     const o = document.getElementById('cloud-overlay');
     o.style.display = 'flex';
-    document.getElementById('cloud-step-login').style.display = step === 'login' ? 'block' : 'none';
-    document.getElementById('cloud-step-shop').style.display = step === 'shop' ? 'block' : 'none';
+    ['login', 'shop', 'forgot', 'newpass'].forEach(s => { document.getElementById('cloud-step-' + s).style.display = s === step ? 'block' : 'none'; });
     document.getElementById('cloud-skip').style.display = (!navigator.onLine || !this.client) && step === 'login' ? 'block' : 'none';
     this._msg(msg || '');
   },
@@ -215,7 +262,20 @@ const CloudAuth = {
         '<input id="cloud-email" type="email" placeholder="Email" autocomplete="email">' +
         '<input id="cloud-pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">' +
         '<button id="cloud-submit" class="btn btn-primary" onclick="CloudAuth.submit()">Se connecter</button>' +
+        '<button class="cloud-link" onclick="CloudAuth.showForgot()">Mot de passe oublié ?</button>' +
         '<button id="cloud-skip" class="cloud-link" onclick="CloudAuth.skip()" style="display:none">Continuer sans compte (hors ligne)</button>' +
+      '</div>' +
+      '<div id="cloud-step-forgot" style="display:none">' +
+        '<div class="cloud-hint">Entrez votre email : nous vous envoyons un lien pour choisir un nouveau mot de passe.</div>' +
+        '<input id="cloud-email2" type="email" placeholder="Email" autocomplete="email">' +
+        '<button class="btn btn-primary" onclick="CloudAuth.sendReset()">Envoyer le lien</button>' +
+        '<button class="cloud-link" onclick="CloudAuth.showLogin()">Retour à la connexion</button>' +
+      '</div>' +
+      '<div id="cloud-step-newpass" style="display:none">' +
+        '<div class="cloud-hint">Choisissez votre nouveau mot de passe.</div>' +
+        '<input id="cloud-np1" type="password" placeholder="Nouveau mot de passe (6 caractères min.)" autocomplete="new-password">' +
+        '<input id="cloud-np2" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password">' +
+        '<button class="btn btn-primary" onclick="CloudAuth.savePassword()">Enregistrer</button>' +
       '</div>' +
       '<div id="cloud-step-shop" style="display:none">' +
         '<div class="cloud-hint">Dernière étape : nommez votre boutique. 14 jours d\'essai gratuit.</div>' +
@@ -227,7 +287,8 @@ const CloudAuth = {
     document.body.appendChild(o);
     o.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
-      if (document.getElementById('cloud-step-shop').style.display !== 'none') this.createShop(); else this.submit();
+      const vis = id => document.getElementById('cloud-step-' + id).style.display !== 'none';
+      if (vis('shop')) this.createShop(); else if (vis('forgot')) this.sendReset(); else if (vis('newpass')) this.savePassword(); else this.submit();
     });
   }
 };

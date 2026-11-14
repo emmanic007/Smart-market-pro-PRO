@@ -1,3 +1,4 @@
+window.__SMP_BOOT_HASH = location.hash;   // adresse d'arrivée (lien « mot de passe oublié »), lue avant que l'app ne la modifie
 /* ── Chargement CDN non-bloquant + Service Worker PWA ── */
 (function(){
   function loadScript(src, onload, onerror){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=onload||null; s.onerror=onerror||null; document.head.appendChild(s); }

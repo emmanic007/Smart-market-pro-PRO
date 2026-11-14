@@ -1,7 +1,7 @@
 /* Smart Market Pro — Service Worker (version PRO)
    Si tu ajoutes ou renommes un fichier JS/CSS, mets-le dans APP_SHELL
    ET change CACHE_VERSION pour forcer la mise à jour chez les utilisateurs. */
-const CACHE_VERSION = 'smp-pro-v5';
+const CACHE_VERSION = 'smp-pro-v6';
 const CDN_HOSTS = ['cdn.jsdelivr.net'];            // Chart.js, SheetJS : mémorisés pour le hors ligne
 const APP_SHELL = [
   './',
@@ -63,7 +63,7 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_VERSION).then(c => c.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE_VERSION).then(c => c.addAll(APP_SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -88,11 +88,11 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (url.origin !== location.origin) return;           // Google Fonts, Supabase : réseau direct
-  e.respondWith(
-    caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE_VERSION).then(c => c.put(e.request, copy));
-      return res;
-    }).catch(() => caches.match('./index.html')))
-  );
+  // Fichiers de l'app : réponse immédiate depuis la copie locale (rapide + hors ligne),
+  // puis mise à jour en arrière-plan : la nouvelle version s'affiche au prochain chargement.
+  e.respondWith(caches.open(CACHE_VERSION).then(cache => cache.match(e.request, { ignoreSearch: true }).then(hit => {
+    const net = fetch(e.request, { cache: 'no-cache' }).then(res => { if (res && res.ok) cache.put(e.request, res.clone()); return res; }).catch(() => null);
+    if (hit) { e.waitUntil(net); return hit; }
+    return net.then(res => res || cache.match('./index.html'));
+  })));
 });
