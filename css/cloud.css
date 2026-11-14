@@ -23,3 +23,4 @@
 .ct-x{background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--danger);font-size:.68rem;padding:4px 8px;cursor:pointer;}
 .ct-form{display:grid;gap:8px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
 .ct-form input,.ct-form select{padding:11px 12px;background:var(--sur2);border:1px solid var(--bord2);border-radius:var(--rmd);color:var(--text);font-family:var(--fb);}
+.ct-share{color:var(--accent);margin-right:6px;}

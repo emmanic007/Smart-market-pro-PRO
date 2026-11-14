@@ -67,8 +67,9 @@ const CloudTeam = {
     const rows = this.members.map((m, i) => ({ m, i })).sort((a, b) => (a.m.pending - b.m.pending) || (order[a.m.role] - order[b.m.role]));
     L.innerHTML = rows.map(({ m, i }) => {
       const nm = Utils.esc(m.display_name || String(m.email).split('@')[0]);
-      const act = this._isOwner() && m.role !== 'owner'
-        ? '<button class="ct-x" onclick="CloudTeam.' + (m.pending ? 'cancel' : 'remove') + '(' + i + ')">' + (m.pending ? 'Annuler' : 'Retirer') + '</button>' : '';
+      const act = (m.pending ? '<button class="ct-x ct-share" onclick="CloudTeam.share(' + i + ')">Partager</button>' : '') +
+        (this._isOwner() && m.role !== 'owner'
+          ? '<button class="ct-x" onclick="CloudTeam.' + (m.pending ? 'cancel' : 'remove') + '(' + i + ')">' + (m.pending ? 'Annuler' : 'Retirer') + '</button>' : '');
       return '<div class="ct-row"><div><b>' + nm + '</b><div class="ct-sub">' + Utils.esc(m.email) + '</div></div>' +
         '<div class="ct-badge ct-' + m.role + '">' + (m.pending ? '⏳ En attente · ' : '') + this.ROLE[m.role] + '</div>' + act + '</div>';
     }).join('');
@@ -81,10 +82,21 @@ const CloudTeam = {
     try {
       const { data, error } = await CloudAuth.client.rpc('invite_member', { p_shop: CloudAuth.ctx.shopId, p_email: email, p_role: role, p_name: name || null });
       if (error) throw error;
-      UI.toast(data === 'added' ? 'Membre ajouté ✔' : 'Invitation enregistrée : la personne doit créer son compte avec cet email', 'success');
+      UI.toast(data === 'added' ? 'Membre ajouté ✔' : 'Invitation enregistrée : touchez « Partager » pour l\'envoyer (WhatsApp, SMS…)', 'success');
       this._el('ct-name').value = ''; this._el('ct-email').value = '';
       await this.fetch(); this._list();
     } catch (e) { UI.toast(CloudAuth._err(e), 'danger'); }
+  },
+  inviteText(m) {   // aucun email automatique : on partage le message par WhatsApp, SMS, etc.
+    const url = location.origin + location.pathname, shop = (CloudAuth.ctx && CloudAuth.ctx.shopName) || 'ma boutique';
+    return 'Bonjour' + (m.display_name ? ' ' + m.display_name : '') + ', tu es invité(e) à rejoindre la boutique « ' + shop + ' » sur Smart Market Pro.\n\n' +
+      '1) Ouvre : ' + url + '\n2) Touche « Créer un compte »\n3) Utilise exactement cet email : ' + m.email + '\n\nTu entreras directement dans la boutique.';
+  },
+  share(i) {
+    const m = this.members[i]; if (!m) return;
+    const text = this.inviteText(m);
+    if (navigator.share) navigator.share({ text }).catch(() => {});
+    else window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   },
   async remove(i) {
     const m = this.members[i]; if (!m) return;

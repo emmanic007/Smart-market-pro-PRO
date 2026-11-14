@@ -10,7 +10,7 @@ const DeferredSales = {
     const sel = document.getElementById('def-seller');
     if (sel) {
       sel.innerHTML = `<option value="">${I18n.t('def_seller_self')}</option>`;
-      DB.data.users.forEach(u => {
+      DB.data.users.filter(u => Auth.isAdmin() || u.id === Auth.currentUser?.id).forEach(u => {   // un vendeur ne saisit que pour lui
         const o = document.createElement('option');
         o.value = u.id; o.textContent = u.name;
         if (Auth.currentUser && u.id === Auth.currentUser.id) o.selected = true;
