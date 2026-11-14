@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Smart Market Pro — Administration</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0e14;--sur:#141923;--bd:#242b3a;--tx:#e8ecf4;--mut:#8a94a8;--ac:#2ee6a6;--warn:#f5b941;--bad:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;padding:16px;max-width:820px;margin:auto}
+h1{font-size:1.1rem;margin:4px 0 14px}input{width:100%;padding:12px;background:var(--sur);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-size:.95rem;margin-bottom:10px}
+button{padding:9px 12px;background:var(--sur);border:1px solid var(--bd);border-radius:10px;color:var(--tx);cursor:pointer;font-size:.8rem}button.p{background:var(--ac);color:#000;border:0;font-weight:700;padding:12px;width:100%}
+.card{background:var(--sur);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:10px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.name{font-weight:700}.sub{color:var(--mut);font-size:.75rem;margin-top:2px}.b{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700}
+.ok{background:#12372b;color:var(--ac)}.tr{background:#3a2f12;color:var(--warn)}.ex{background:#3a1717;color:var(--bad)}.msg{color:var(--bad);font-size:.8rem;min-height:1.2em;margin:6px 0}
+.acts{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}.sp{flex:1}[hidden]{display:none!important}
+</style></head><body>
+<div id="login" hidden><h1>Administration — connexion</h1>
+ <input id="em" type="email" placeholder="Email administrateur"><input id="pw" type="password" placeholder="Mot de passe">
+ <button class="p" onclick="login()">Se connecter</button><div class="msg" id="lmsg"></div></div>
+<div id="app" hidden><div class="row"><h1 class="sp">Boutiques</h1><button onclick="load()">↻ Actualiser</button><button onclick="logout()">Déconnexion</button></div>
+ <input id="q" placeholder="Rechercher (nom, email, code)…" oninput="draw()"><div class="sub" id="cnt" style="margin-bottom:10px"></div><div id="list"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/cloud/config.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const c=supabase.createClient(CLOUD_CONFIG.url,CLOUD_CONFIG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+let rows=[];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+function show(w){$('login').hidden=w!=='login';$('app').hidden=w!=='app'}
+async function init(){const{data}=await c.auth.getSession();data.session?load():show('login')}
+async function login(){$('lmsg').textContent='';const{error}=await c.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});
+ if(error){$('lmsg').textContent='Email ou mot de passe incorrect.';return}load()}
+async function logout(){await c.auth.signOut();show('login')}
+async function load(){const{data,error}=await c.rpc('admin_list_shops');
+ if(error){show('login');$('lmsg').textContent='Accès refusé : ce compte n\'est pas administrateur.';return}
+ rows=data||[];show('app');draw()}
+function info(r){const end=new Date(r.status==='active'?r.current_period_end:r.trial_ends_at),d=Math.ceil((end-Date.now())/864e5);
+ if(r.status==='active'&&d>0)return['ok','Actif · '+d+' j'];if(r.status==='trialing'&&d>0)return['tr','Essai · '+d+' j'];return['ex','Expiré']}
+function draw(){const q=$('q').value.toLowerCase().trim();
+ const f=rows.filter(r=>(r.name+' '+r.owner_email+' '+r.shop_id).toLowerCase().includes(q));
+ $('cnt').textContent=f.length+' boutique(s) sur '+rows.length;
+ $('list').innerHTML=f.map(r=>{const[k,t]=info(r),act=r.last_activity?new Date(r.last_activity).toLocaleDateString('fr-FR'):'—';
+  return '<div class="card"><div class="row"><div class="sp"><div class="name">'+esc(r.name)+'</div><div class="sub">'+esc(r.owner_email)+' · code '+esc(r.shop_id.slice(0,8).toUpperCase())+'</div>'+
+  '<div class="sub">'+r.members+' membre(s) · dernière activité '+act+'</div></div><span class="b '+k+'">'+t+'</span></div><div class="acts">'+
+  BILLING.options.map(o=>'<button onclick="activate(\''+r.shop_id+'\','+o.months+','+o.price+')">+ '+esc(o.label)+'</button>').join('')+'</div></div>'}).join('')}
+async function activate(id,months,price){const r=rows.find(x=>x.shop_id===id);
+ const ref=prompt('Paiement reçu de « '+r.name+' » : '+months+' mois, '+fmt(price)+' F.\nMoyen et référence (ex : MTN 0197… réf 12345) — facultatif :','');
+ if(ref===null)return;
+ const{error}=await c.rpc('admin_activate',{p_shop:id,p_months:months,p_amount:price,p_method:ref,p_ref:null});
+ if(error){alert('Erreur : '+error.message);return}await load()}
+init();
+</script></body></html>

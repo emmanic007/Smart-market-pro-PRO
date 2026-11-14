@@ -24,3 +24,11 @@
 .ct-form{display:grid;gap:8px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
 .ct-form input,.ct-form select{padding:11px 12px;background:var(--sur2);border:1px solid var(--bord2);border-radius:var(--rmd);color:var(--text);font-family:var(--fb);}
 .ct-share{color:var(--accent);margin-right:6px;}
+#billing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:10001;display:none;align-items:center;justify-content:center;padding:16px;}
+#billing-overlay .btn{width:100%;margin-top:6px;}
+#billing-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rmd);padding:16px;margin-bottom:18px;}
+#billing-card .btn{margin-top:4px;}
+.bill-opts{display:grid;gap:8px;margin:12px 0;}
+.bill-opt{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--sur2);border:1px solid var(--border);border-radius:var(--rmd);color:var(--text);font-family:var(--fb);cursor:pointer;}
+.bill-opt.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.bill-opt span{color:var(--accent);font-weight:700;}

@@ -187,6 +187,7 @@ const CloudAuth = {
     if (this.ctx && this.ctx.shopId) this._initClient().then(ok => { if (ok) Sync.start(); });
     if (this.isSeller()) { this._sellerHook(); this._sellerLogin(); return; }   // vendeur cloud : pas de PIN
     if ((typeof CloudTeam !== 'undefined')) CloudTeam.init();
+    if (typeof Billing !== 'undefined') Billing.init();
     Auth.ensureDefaultAdmin().then(() => {
       Auth.renderAccountsList();
       const ov = document.getElementById('auth-overlay');

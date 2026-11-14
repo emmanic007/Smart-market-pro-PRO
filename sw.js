@@ -12,6 +12,7 @@ const APP_SHELL = [
   './css/cloud.css',
   './js/cloud/config.js',
   './js/cloud/sync.js',
+  './js/cloud/billing.js',
   './js/cloud/cloud-team.js',
   './js/cloud/cloud-auth.js',
   './js/core/utils.js',

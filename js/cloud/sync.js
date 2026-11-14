@@ -95,6 +95,7 @@ const Sync = {
       if (!this._blocked) await this._push();
       this._save();
       this._set(this._blocked ? 'blocked' : 'idle');
+      if (typeof Billing !== 'undefined') Billing.onStatus();
       if (changed) this._refreshUI();
       if (!this._teamDone && (typeof CloudTeam !== 'undefined') && CloudAuth.ctx && CloudAuth.ctx.role !== 'seller') { this._teamDone = true; CloudTeam.fetch().catch(() => {}); }
     } catch (e) { this._onErr(e); }
@@ -218,10 +219,12 @@ const Sync = {
       t = '☁ Synchronisé';
       const nr = Object.keys((this.store && this.store.rej) || {}).length;
       if (nr) t = '⚠ ' + nr + ' modification(s) refusée(s) : droits insuffisants';
+      else if (this.sub && this.sub.status === 'active' && this.sub.current_period_end && (new Date(this.sub.current_period_end) - Date.now()) < 7 * 864e5)
+        t += ' · abonnement : ' + Math.max(0, Math.ceil((new Date(this.sub.current_period_end) - Date.now()) / 864e5)) + ' j';
       else if (this.sub && this.sub.status === 'trialing') t += ' · essai ' + Math.max(0, Math.ceil((new Date(this.sub.trial_ends_at) - Date.now()) / 864e5)) + ' j';
     }
     else if (st === 'offline') { const n = this.pendingCount(); t = '⏸ Hors ligne' + (n ? ' · ' + n + ' en attente' : ''); }
-    else if (st === 'blocked') t = '⚠ Abonnement expiré — données gardées sur l\'appareil';
+    else if (st === 'blocked') t = (CloudAuth.ctx && CloudAuth.ctx.role === 'owner') ? '⚠ Abonnement expiré : touchez pour renouveler' : '⚠ Abonnement expiré : contactez le propriétaire';
     else if (st === 'auth') t = '⚠ Reconnexion requise (touchez ici)';
     else if (st === 'foreign') t = '⚠ Cet appareil contient les données d\'une autre boutique';
     else t = '⚠ Erreur de synchro · toucher pour réessayer';
@@ -229,6 +232,7 @@ const Sync = {
     el.lastChild.textContent = t;
     el.style.display = 'flex';
     if (st === 'auth') el.onclick = () => CloudAuth.signOut();
+    else if (st === 'blocked' && typeof Billing !== 'undefined') el.onclick = () => Billing.open();
     else el.onclick = () => this.now();
     if (st === 'idle' && t.indexOf('⚠') !== 0) this._hideT = setTimeout(() => { el.style.display = 'none'; }, 3500);
   }
