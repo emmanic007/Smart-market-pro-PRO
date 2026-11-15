@@ -52,9 +52,8 @@ const CloudTeam = {
         '<div id="ct-list" class="ct-list"></div>' +
         (this._isOwner() ?
           '<div class="ct-form"><input id="ct-name" type="text" placeholder="Nom du vendeur (affiché sur les ventes)" maxlength="40">' +
-          '<input id="ct-email" type="email" placeholder="Email du vendeur">' +
           '<select id="ct-role"><option value="seller">Vendeur</option><option value="manager">Gérant</option></select>' +
-          '<button class="btn btn-primary" onclick="CloudTeam.invite()">Inviter</button></div>' : '');
+          '<button class="btn btn-primary" onclick="CloudTeam.invite()">Créer un code d\'invitation</button></div>' : '');
     }
     this._list();
     if (!navigator.onLine) { this._el('ct-list').insertAdjacentHTML('afterbegin', '<div class="ct-hint">Hors ligne : liste enregistrée.</div>'); return; }
@@ -66,31 +65,35 @@ const CloudTeam = {
     const order = { owner: 0, manager: 1, seller: 2 };
     const rows = this.members.map((m, i) => ({ m, i })).sort((a, b) => (a.m.pending - b.m.pending) || (order[a.m.role] - order[b.m.role]));
     L.innerHTML = rows.map(({ m, i }) => {
-      const nm = Utils.esc(m.display_name || String(m.email).split('@')[0]);
+      const nm = Utils.esc(m.display_name || (m.pending ? 'Invitation' : String(m.email).split('@')[0]));
+      const sub = m.pending ? 'Code : <b>' + Utils.esc(m.code) + '</b>' : Utils.esc(m.email);
       const act = (m.pending ? '<button class="ct-x ct-share" onclick="CloudTeam.share(' + i + ')">Partager</button>' : '') +
         (this._isOwner() && m.role !== 'owner'
           ? '<button class="ct-x" onclick="CloudTeam.' + (m.pending ? 'cancel' : 'remove') + '(' + i + ')">' + (m.pending ? 'Annuler' : 'Retirer') + '</button>' : '');
-      return '<div class="ct-row"><div><b>' + nm + '</b><div class="ct-sub">' + Utils.esc(m.email) + '</div></div>' +
+      return '<div class="ct-row"><div><b>' + nm + '</b><div class="ct-sub">' + sub + '</div></div>' +
         '<div class="ct-badge ct-' + m.role + '">' + (m.pending ? '⏳ En attente · ' : '') + this.ROLE[m.role] + '</div>' + act + '</div>';
     }).join('');
   },
 
   async invite() {
-    const name = this._el('ct-name').value.trim(), email = this._el('ct-email').value.trim(), role = this._el('ct-role').value;
-    if (!/^\S+@\S+\.\S+$/.test(email)) return UI.toast('Email invalide', 'danger');
+    const name = this._el('ct-name').value.trim(), role = this._el('ct-role').value;
+    if (!name) return UI.toast('Entrez le nom du vendeur', 'danger');
     if (!navigator.onLine) return UI.toast('Connexion internet requise', 'danger');
     try {
-      const { data, error } = await CloudAuth.client.rpc('invite_member', { p_shop: CloudAuth.ctx.shopId, p_email: email, p_role: role, p_name: name || null });
+      const { data, error } = await CloudAuth.client.rpc('create_invite_code', { p_shop: CloudAuth.ctx.shopId, p_role: role, p_name: name });
       if (error) throw error;
-      UI.toast(data === 'added' ? 'Membre ajouté ✔' : 'Invitation enregistrée : touchez « Partager » pour l\'envoyer (WhatsApp, SMS…)', 'success');
-      this._el('ct-name').value = ''; this._el('ct-email').value = '';
+      this._el('ct-name').value = '';
       await this.fetch(); this._list();
+      const i = this.members.findIndex(m => m.pending && m.code === data);
+      UI.toast('Code créé : ' + data + ' — touchez « Partager »', 'success');
+      if (i >= 0) this.share(i);
     } catch (e) { UI.toast(CloudAuth._err(e), 'danger'); }
   },
-  inviteText(m) {   // aucun email automatique : on partage le message par WhatsApp, SMS, etc.
+  inviteText(m) {   // aucun email : on partage le message avec le code par WhatsApp, SMS, etc.
     const url = location.origin + location.pathname, shop = (CloudAuth.ctx && CloudAuth.ctx.shopName) || 'ma boutique';
     return 'Bonjour' + (m.display_name ? ' ' + m.display_name : '') + ', tu es invité(e) à rejoindre la boutique « ' + shop + ' » sur Smart Market Pro.\n\n' +
-      '1) Ouvre : ' + url + '\n2) Touche « Créer un compte »\n3) Utilise exactement cet email : ' + m.email + '\n\nTu entreras directement dans la boutique.';
+      '1) Ouvre : ' + url + '\n2) Touche « Créer un compte » (ton email et un mot de passe de ton choix)\n' +
+      '3) Touche « J\'ai un code » et saisis : ' + m.code + '\n\nCe code est valable 14 jours et ne sert qu\'une seule fois.';
   },
   share(i) {
     const m = this.members[i]; if (!m) return;
@@ -110,7 +113,7 @@ const CloudTeam = {
   async cancel(i) {
     const m = this.members[i]; if (!m) return;
     try {
-      const { error } = await CloudAuth.client.rpc('cancel_invitation', { p_shop: CloudAuth.ctx.shopId, p_email: m.email });
+      const { error } = await CloudAuth.client.rpc('cancel_invite_code', { p_shop: CloudAuth.ctx.shopId, p_code: m.code });
       if (error) throw error;
       await this.fetch(); this._list();
     } catch (e) { UI.toast(CloudAuth._err(e), 'danger'); }

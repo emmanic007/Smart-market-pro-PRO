@@ -62,7 +62,8 @@ const CloudAuth = {
   /* ---------- Mot de passe oublié ---------- */
   _recoveryParams() {
     const p = new URLSearchParams((window.__SMP_BOOT_HASH || '').replace(/^#/, ''));
-    if (p.get('type') === 'recovery' && p.get('access_token')) return { at: p.get('access_token'), rt: p.get('refresh_token') || '' };
+    if (/^(recovery|signup|invite|magiclink|email_change)$/.test(p.get('type') || '') && p.get('access_token'))
+      return { at: p.get('access_token'), rt: p.get('refresh_token') || '', kind: p.get('type') };
     if (p.get('error')) return { error: true };
     return null;
   },
@@ -73,7 +74,11 @@ const CloudAuth = {
     if (rec.error) return this._show('login', expired);
     const { error } = await this.client.auth.setSession({ access_token: rec.at, refresh_token: rec.rt });
     if (error) return this._show('login', expired);
-    this._show('newpass');
+    if (rec.kind === 'recovery') return this._show('newpass');
+    const { data } = await this.client.auth.getSession();       // lien de confirmation d'email : la personne est connectée
+    if (!data || !data.session) return this._show('login', 'Email confirmé. Connectez-vous.');
+    this.user = data.session.user;
+    this._afterAuth();
   },
   showForgot() { const e = document.getElementById('cloud-email').value; this._show('forgot'); document.getElementById('cloud-email2').value = e; },
   showLogin() { this._show('login'); },
@@ -136,14 +141,23 @@ const CloudAuth = {
         : await this.client.auth.signInWithPassword({ email, password: pw });
       if (res.error) throw res.error;
       const s = res.data && res.data.session;
-      if (!s) { this._busy(false); return this._msg('Compte créé. Confirmez votre email, puis connectez-vous.', true); }
+      if (!s) { this._busy(false); return this._msg('Compte créé. Un email de confirmation vient d\'être envoyé à ' + email + '. Ouvrez-le (voir aussi les courriers indésirables) : le lien vous connecte directement.', true); }
       this.user = s.user;
       await this._afterAuth();
-    } catch (e) { this._msg(this._err(e)); }
+    } catch (e) {
+      if (/not confirmed/i.test(String((e && e.message) || ''))) {
+        this._busy(false);
+        if (confirm('Cet email n\'est pas encore confirmé.\nRenvoyer l\'email de confirmation à ' + email + ' ?')) {
+          try { const r = await this.client.auth.resend({ type: 'signup', email }); if (r.error) throw r.error; this._msg('Email de confirmation renvoyé. Vérifiez aussi les courriers indésirables.', true); }
+          catch (e2) { this._msg(this._err(e2)); }
+        } else this._msg('Confirmez votre email avec le lien reçu, puis reconnectez-vous.');
+        return;
+      }
+      this._msg(this._err(e));
+    }
     this._busy(false);
   },
   async _afterAuth() {
-    try { await this.client.rpc('accept_invitations'); } catch (e) {}   // une invitation attend cet email ?
     const r = await this._loadShop();
     if (r === false) return this._show('shop');
     if (r === null) return this._show('login', 'Impossible de charger votre boutique. Réessayez.');
@@ -164,6 +178,24 @@ const CloudAuth = {
       console.warn('[Cloud] loadShop', e);
       return (this.ctx && this.ctx.userId === this.user.id && this.ctx.shopId) ? true : null;
     }
+  },
+  shopTab(t) {
+    document.getElementById('cloud-tab-new').classList.toggle('on', t === 'new');
+    document.getElementById('cloud-tab-code').classList.toggle('on', t === 'code');
+    document.getElementById('cloud-pane-new').style.display = t === 'new' ? 'block' : 'none';
+    document.getElementById('cloud-pane-code').style.display = t === 'code' ? 'block' : 'none';
+    this._msg('');
+  },
+  async joinWithCode() {
+    const code = document.getElementById('cloud-code').value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (code.length < 8) return this._msg('Saisissez le code complet.');
+    this._busy(true);
+    try {
+      const { error } = await this.client.rpc('accept_invite_code', { p_code: code });
+      if (error) throw error;
+      await this._afterAuth();
+    } catch (e) { this._msg(this._err(e)); }
+    this._busy(false);
   },
   async createShop() {
     const name = document.getElementById('cloud-shop').value.trim();
@@ -300,9 +332,14 @@ const CloudAuth = {
         '<button class="btn btn-primary" onclick="CloudAuth.savePassword()">Enregistrer</button>' +
       '</div>' +
       '<div id="cloud-step-shop" style="display:none">' +
-        '<div class="cloud-hint">Dernière étape : nommez votre boutique. 14 jours d\'essai gratuit.</div>' +
+        '<div class="cloud-tabs"><button id="cloud-tab-new" class="on" onclick="CloudAuth.shopTab(\'new\')">Créer ma boutique</button>' +
+        '<button id="cloud-tab-code" onclick="CloudAuth.shopTab(\'code\')">J\'ai un code</button></div>' +
+        '<div id="cloud-pane-new"><div class="cloud-hint">Nommez votre boutique. 14 jours d\'essai gratuit.</div>' +
         '<input id="cloud-shop" type="text" placeholder="Nom de la boutique" maxlength="60">' +
-        '<button class="btn btn-primary" onclick="CloudAuth.createShop()">Créer ma boutique</button>' +
+        '<button class="btn btn-primary" onclick="CloudAuth.createShop()">Créer ma boutique</button></div>' +
+        '<div id="cloud-pane-code" style="display:none"><div class="cloud-hint">Saisissez le code d\'invitation reçu de votre patron (par WhatsApp).</div>' +
+        '<input id="cloud-code" type="text" placeholder="CODE D\'INVITATION" maxlength="16" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.15em;text-align:center">' +
+        '<button class="btn btn-primary" onclick="CloudAuth.joinWithCode()">Rejoindre la boutique</button></div>' +
         '<button class="cloud-link" onclick="CloudAuth.signOut()">Se déconnecter</button>' +
       '</div>' +
       '<div id="cloud-msg" class="cloud-msg"></div></div>';
@@ -310,7 +347,7 @@ const CloudAuth = {
     o.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
       const vis = id => document.getElementById('cloud-step-' + id).style.display !== 'none';
-      if (vis('shop')) this.createShop(); else if (vis('forgot')) this.sendReset(); else if (vis('newpass')) this.savePassword(); else this.submit();
+      if (vis('shop')) { if (document.getElementById('cloud-pane-code').style.display !== 'none') this.joinWithCode(); else this.createShop(); } else if (vis('forgot')) this.sendReset(); else if (vis('newpass')) this.savePassword(); else this.submit();
     });
   }
 };
