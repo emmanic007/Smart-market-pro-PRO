@@ -32,7 +32,9 @@ async function login(){$('lmsg').textContent='';const{error}=await c.auth.signIn
  if(error){$('lmsg').textContent='Email ou mot de passe incorrect.';return}load()}
 async function logout(){await c.auth.signOut();show('login')}
 async function load(){const{data,error}=await c.rpc('admin_list_shops');
- if(error){show('login');$('lmsg').textContent='Accès refusé : ce compte n\'est pas administrateur.';return}
+ if(error){const s=(await c.auth.getSession()).data.session,em=s&&s.user?s.user.email:'?',m=String(error.message||'');
+  show('login');$('lmsg').textContent=/refus/i.test(m)?'Accès refusé : le compte « '+em+' » n\'est pas déclaré administrateur.'
+   :/does not exist|schema cache|Could not find/i.test(m)?'Le script SQL « abonnement » n\'a pas été lancé dans Supabase.':'Erreur : '+m;return}
  rows=data||[];show('app');draw()}
 function info(r){const end=new Date(r.status==='active'?r.current_period_end:r.trial_ends_at),d=Math.ceil((end-Date.now())/864e5);
  if(r.status==='active'&&d>0)return['ok','Actif · '+d+' j'];if(r.status==='trialing'&&d>0)return['tr','Essai · '+d+' j'];return['ex','Expiré']}
