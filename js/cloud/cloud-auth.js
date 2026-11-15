@@ -179,8 +179,29 @@ const CloudAuth = {
 
   /* ---------- Entrée dans l'app / déconnexion ---------- */
   skip() { this._enterApp(); },    // usage local sans compte (première ouverture hors ligne)
+  /* L'appareil contient les données d'une autre boutique : on les met de côté (sans les perdre), on charge
+     celles de la boutique connectée (ou une base vide), puis on recharge. Un retour sur l'ancien compte les restaure. */
+  _swapShopData() {
+    if (!this.ctx || !this.ctx.shopId) return false;
+    const have = DB.data && DB.data.shopId, want = this.ctx.shopId;
+    if (!have || have === want) { sessionStorage.removeItem('smp_swap'); return false; }   // rien à changer
+    if (sessionStorage.getItem('smp_swap')) { sessionStorage.removeItem('smp_swap'); return false; }   // anti-boucle
+    const KEEP = /^(SMP_CLOUD_CTX|SMP_SYNC_|SMP_ARCH_|SMP_PWA_DISMISSED|SMP_STORAGE_PREF|SMP_AI_CFG)/;
+    try {
+      const mine = {};
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^SMP_/.test(k) && !KEEP.test(k)) mine[k] = localStorage.getItem(k); }
+      localStorage.setItem('SMP_ARCH_' + have, JSON.stringify(mine));          // si ça échoue (mémoire pleine) : on ne touche à rien
+      Object.keys(mine).forEach(k => localStorage.removeItem(k));
+      const prev = localStorage.getItem('SMP_ARCH_' + want);
+      if (prev) { const o = JSON.parse(prev); Object.keys(o).forEach(k => localStorage.setItem(k, o[k])); localStorage.removeItem('SMP_ARCH_' + want); }
+      sessionStorage.setItem('smp_swap', '1');
+    } catch (e) { console.warn('[Cloud] changement de boutique impossible', e); return false; }
+    location.reload();
+    return true;
+  },
   _enterApp() {
     if (this._entered) return;
+    if (this._swapShopData()) return;
     this._entered = true;
     this._hide();
     this._badge();
