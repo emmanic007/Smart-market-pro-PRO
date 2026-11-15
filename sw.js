@@ -10,6 +10,7 @@ const APP_SHELL = [
   './css/seller-mode.css',
   './js/core/boot.js',
   './css/cloud.css',
+  './js/core/pwtoggle.js',
   './js/cloud/config.js',
   './js/cloud/sync.js',
   './js/cloud/billing.js',
