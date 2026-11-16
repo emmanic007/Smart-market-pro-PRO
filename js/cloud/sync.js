@@ -29,17 +29,24 @@ const Sync = {
     window.addEventListener('online', () => this.schedule(500));
     window.addEventListener('offline', () => this._set('offline'));
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.schedule(500); });
-    setInterval(() => { if (document.visibilityState === 'visible') this.schedule(0); }, 120000);
-    try {                                            // temps réel : un autre appareil a modifié quelque chose
-      this.c.channel('rec-' + this.shop)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'records', filter: 'shop_id=eq.' + this.shop }, () => this.schedule(800))
-        .subscribe();
-    } catch (e) {}
+    let tick = 0;                                    // vérification de secours : toutes les 30 s si le direct ne marche pas, sinon 90 s
+    setInterval(() => {
+      tick++;
+      if (document.visibilityState === 'visible' && tick % (this.rt === 'SUBSCRIBED' ? 6 : 2) === 0) this.schedule(0);
+    }, 15000);
+    this.c.auth.getSession().then(() => this._listen(), () => this._listen());   // le direct démarre quand la session est prête
     this.now();
+  },
+  _listen() {
+    try {
+      this.c.channel('rec-' + this.shop)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'records', filter: 'shop_id=eq.' + this.shop }, () => this.schedule(500))
+        .subscribe(st => { this.rt = st; });
+    } catch (e) { this.rt = 'ERROR'; }
   },
   _rawSave() { try { localStorage.setItem(DB.KEY, JSON.stringify(DB.data)); } catch (e) {} },
   ready() { return !!(this._started && this.c && this.shop); },
-  schedule(ms) { clearTimeout(this._timer); this._timer = setTimeout(() => this.now(), ms === undefined ? 2500 : ms); },
+  schedule(ms) { clearTimeout(this._timer); this._timer = setTimeout(() => this.now(), ms === undefined ? 1200 : ms); },
 
   /* ---------- Outils ---------- */
   _load() { try { this.store = JSON.parse(localStorage.getItem('SMP_SYNC_' + this.shop) || 'null'); } catch (e) {} if (!this.store) this.store = { pull: null, h: {} };
@@ -285,12 +292,29 @@ const Sync = {
   },
 
   /* ---------- Affichage ---------- */
-  _refreshUI() {
+  _shown(id) { const e = document.getElementById(id); return !!e && getComputedStyle(e).display !== 'none'; },
+  _refreshUI() {        // remet l'écran à jour sans effacer ce que la personne est en train de saisir
     try {
-      const a = document.activeElement;
-      if ((a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) || !Auth.currentUser || UI._currentTab === 'sales') return;
-      UI.switchTab(UI._currentTab, true);
+      let overlay = false;
+      if (this._shown('seller-mode-overlay') && typeof SellerMode !== 'undefined') {          // caisse vendeur : produits et stock
+        const g = document.getElementById('sm-products-grid'), sc = g ? g.scrollTop : 0;
+        SellerMode.renderProducts(); if (g) g.scrollTop = sc; overlay = true;
+      }
+      if (this._shown('seller-dash-overlay') && typeof SellerDash !== 'undefined') { SellerDash.refresh(); overlay = true; }
+      if (overlay || !Auth.currentUser || this._shown('deferred-overlay')) return;
+      const a = document.activeElement, typing = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+      if (UI._currentTab === 'sales') return this._refreshSales();
+      if (!typing) UI.switchTab(UI._currentTab, true);
     } catch (e) {}
+  },
+  _refreshSales() {     // écran de vente : met à jour les stocks affichés sans toucher à la saisie en cours
+    const sec = document.getElementById('sales');
+    const keep = sec ? [...sec.querySelectorAll('input,textarea,select')].filter(e => e.id).map(e => [e.id, e.type === 'checkbox' ? e.checked : e.value]) : [];
+    UI.updateItemSelect(); UI.renderSales();
+    keep.forEach(([id, v]) => { const e = document.getElementById(id); if (e) { if (e.type === 'checkbox') e.checked = v; else e.value = v; } });
+    const q = (document.getElementById('s-item-search') || {}).value;
+    if (q) UI._filterItemSelect(q);
+    if (typeof Sales !== 'undefined' && Sales.validate) Sales.validate();
   },
   _set(st) {
     this.state = st;
@@ -299,7 +323,7 @@ const Sync = {
     let t = '', spin = false;
     if (st === 'syncing') { t = 'Synchronisation…'; spin = true; }
     else if (st === 'idle') {
-      t = '☁ Synchronisé';
+      t = '☁ Synchronisé' + (this.rt === 'SUBSCRIBED' ? ' · direct' : '');
       const nr = Object.keys((this.store && this.store.rej) || {}).length;
       if (nr) t = '⚠ ' + nr + ' modification(s) refusée(s) : droits insuffisants';
       else if (this.sub && this.sub.status === 'active' && this.sub.current_period_end && (new Date(this.sub.current_period_end) - Date.now()) < 7 * 864e5)
