@@ -48,6 +48,7 @@ const DataManager = {
         if (!Array.isArray(data.items)||!Array.isArray(data.sales)||!Array.isArray(data.users)) throw new Error();
         if (!await SmpModal.confirm(I18n.t('modal_import_backup_msg'), {title:I18n.t('modal_import_backup_title'), icon:'📂', okLabel:I18n.t('modal_import_backup_ok'), okClass:'btn-warning'})) return;
         DB.data={...DB.defaultSchema(),...data,items:data.items,sales:data.sales,users:data.users};
+        DB.data.shopId = (typeof CloudAuth !== 'undefined' && CloudAuth.ctx && CloudAuth.ctx.shopId) || null;   // les données importées rejoignent la boutique connectée
         DB.save(); UI.renderAll();
         UI.toast(I18n.t('toast_backup_imported'),'success');
       } catch(_) { UI.toast(I18n.t('toast_err_file_invalid'),'danger'); }

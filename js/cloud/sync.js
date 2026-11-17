@@ -23,7 +23,10 @@ const Sync = {
     this._load();
     const o = DB.save.bind(DB);                      // chaque DB.save() programme une synchro
     this._orig = o;
-    DB.save = () => { o(); if (!this._applying) this.schedule(); };
+    DB.save = () => {
+      if (DB.data && DB.data.shopId !== this.shop) DB.data.shopId = this.shop;   // import / restauration / remise à zéro : les données restent celles de cette boutique
+      o(); if (!this._applying) this.schedule();
+    };
     const el = document.getElementById('sync-indicator');
     if (el) el.onclick = () => this.now();
     window.addEventListener('online', () => this.schedule(500));
