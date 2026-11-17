@@ -126,6 +126,7 @@ const CloudAuth = {
     document.getElementById('cloud-tab-login').classList.toggle('on', m === 'login');
     document.getElementById('cloud-tab-signup').classList.toggle('on', m === 'signup');
     document.getElementById('cloud-submit').textContent = m === 'signup' ? 'Créer mon compte' : 'Se connecter';
+    document.getElementById('cloud-agree-box').style.display = m === 'signup' ? 'flex' : 'none';
     document.getElementById('cloud-pass').autocomplete = m === 'signup' ? 'new-password' : 'current-password';
     this._msg('');
   },
@@ -133,11 +134,13 @@ const CloudAuth = {
     const email = document.getElementById('cloud-email').value.trim().toLowerCase();
     const pw = document.getElementById('cloud-pass').value;
     if (!/^\S+@\S+\.\S+$/.test(email) || pw.length < 6) return this._msg('Email valide et mot de passe de 6 caractères minimum.');
+    if (this._mode === 'signup' && !document.getElementById('cloud-agree').checked) return this._msg('Cochez la case pour accepter les conditions et créer votre compte.');
     if (!this.client && !(await this._initClient())) return this._msg('Connexion internet requise pour se connecter.');
     this._busy(true);
     try {
       const res = this._mode === 'signup'
-        ? await this.client.auth.signUp({ email, password: pw })
+        ? await this.client.auth.signUp({ email, password: pw, options: { data: {
+            terms_version: typeof LEGAL !== 'undefined' ? LEGAL.version : '', terms_accepted_at: new Date().toISOString() } } })
         : await this.client.auth.signInWithPassword({ email, password: pw });
       if (res.error) throw res.error;
       const s = res.data && res.data.session;
@@ -315,8 +318,10 @@ const CloudAuth = {
         '<button id="cloud-tab-signup" onclick="CloudAuth.setMode(\'signup\')">Créer un compte</button></div>' +
         '<input id="cloud-email" type="email" placeholder="Email" autocomplete="email">' +
         '<input id="cloud-pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">' +
+        '<label id="cloud-agree-box" class="cloud-agree" style="display:none"><input type="checkbox" id="cloud-agree"><span>J\'accepte les <a href="conditions.html" target="_blank" rel="noopener">Conditions d\'utilisation</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">Politique de confidentialité</a>.</span></label>' +
         '<button id="cloud-submit" class="btn btn-primary" onclick="CloudAuth.submit()">Se connecter</button>' +
         '<button class="cloud-link" onclick="CloudAuth.showForgot()">Mot de passe oublié ?</button>' +
+        '<div class="cloud-legal"><a href="conditions.html" target="_blank" rel="noopener">Conditions d\'utilisation</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a></div>' +
         '<button id="cloud-skip" class="cloud-link" onclick="CloudAuth.skip()" style="display:none">Continuer sans compte (hors ligne)</button>' +
       '</div>' +
       '<div id="cloud-step-forgot" style="display:none">' +
