@@ -2,20 +2,41 @@
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><title>Smart Market Pro — Administration</title>
 <style>
-:root{color-scheme:dark;--bg:#0b0e14;--sur:#141923;--bd:#242b3a;--tx:#e8ecf4;--mut:#8a94a8;--ac:#2ee6a6;--warn:#f5b941;--bad:#ff6b6b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;padding:16px;max-width:820px;margin:auto}
-h1{font-size:1.1rem;margin:4px 0 14px}input{width:100%;padding:12px;background:var(--sur);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-size:.95rem;margin-bottom:10px}
-button{padding:9px 12px;background:var(--sur);border:1px solid var(--bd);border-radius:10px;color:var(--tx);cursor:pointer;font-size:.8rem}button.p{background:var(--ac);color:#000;border:0;font-weight:700;padding:12px;width:100%}
-.card{background:var(--sur);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:10px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.name{font-weight:700}.sub{color:var(--mut);font-size:.75rem;margin-top:2px}.b{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700}
-.ok{background:#12372b;color:var(--ac)}.tr{background:#3a2f12;color:var(--warn)}.ex{background:#3a1717;color:var(--bad)}.msg{color:var(--bad);font-size:.8rem;min-height:1.2em;margin:6px 0}
-.acts{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}.sp{flex:1}[hidden]{display:none!important}
+:root{color-scheme:dark;--bg:#0b0e14;--sur:#141923;--sur2:#1b2230;--bd:#242b3a;--tx:#e8ecf4;--mut:#8a94a8;--ac:#2ee6a6;--warn:#f5b941;--bad:#ff6b6b;--blue:#6aa9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,sans-serif;font-size:15px;padding-bottom:70px}
+main{max-width:980px;margin:auto;padding:14px}h1{font-size:1.1rem;margin:0}h2{font-size:.95rem;margin:18px 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{width:100%;padding:11px 12px;background:var(--sur);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font:inherit;margin-bottom:8px}
+button{padding:9px 12px;background:var(--sur2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);cursor:pointer;font:inherit;font-size:.82rem}
+button.p{background:var(--ac);color:#000;border:0;font-weight:700;padding:12px;width:100%}button.d{color:var(--bad)}
+.top{display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--bg);padding:12px 14px;border-bottom:1px solid var(--bd);z-index:5}.sp{flex:1}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--sur);border-top:1px solid var(--bd);z-index:6}
+.tabs button{flex:1;border:0;border-radius:0;background:none;padding:12px 2px;font-size:.72rem;color:var(--mut)}.tabs button.on{color:var(--ac);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--sur);border:1px solid var(--bd);border-radius:12px;padding:12px}.kpi b{display:block;font-size:1.5rem}.kpi span{color:var(--mut);font-size:.74rem}
+.card{background:var(--sur);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:9px}.card.clk{cursor:pointer}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.name{font-weight:700}.sub{color:var(--mut);font-size:.76rem;margin-top:2px}
+.b{padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}.ok{background:#12372b;color:var(--ac)}.tr{background:#3a2f12;color:var(--warn)}.ex{background:#3a1717;color:var(--bad)}.sp2{background:#2a2140;color:#b79cff}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.chips button{white-space:nowrap}.chips button.on{background:var(--ac);color:#000;border-color:var(--ac);font-weight:700}
+.bars{display:flex;align-items:flex-end;gap:8px;height:110px;padding:6px 0}.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:.66rem;color:var(--mut)}.bar i{display:block;width:100%;background:var(--ac);border-radius:5px 5px 0 0;min-height:2px}
+.msg{color:var(--bad);font-size:.82rem;min-height:1.2em;margin:6px 0}.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.wa{display:inline-block;background:#128c4a;color:#fff;text-decoration:none;border-radius:10px;padding:8px 11px;font-size:.8rem;font-weight:600}
+.ov{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;display:none}.ov.on{display:block}
+table{width:100%;border-collapse:collapse;font-size:.82rem}td,th{padding:8px 6px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+.pbar{height:14px;background:var(--sur2);border-radius:8px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--ac)}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--sur2);border:1px solid var(--bd);padding:10px 16px;border-radius:10px;z-index:50;display:none}
+[hidden]{display:none!important}
 </style></head><body>
-<div id="login" hidden><h1>Administration — connexion</h1>
+<div id="login" hidden><main style="max-width:420px;padding-top:60px"><h1>Administration — connexion</h1><div style="height:14px"></div>
  <input id="em" type="email" placeholder="Email administrateur"><input id="pw" type="password" placeholder="Mot de passe">
- <button class="p" onclick="login()">Se connecter</button><div class="msg" id="lmsg"></div></div>
-<div id="app" hidden><div class="row"><h1 class="sp">Boutiques</h1><button onclick="load()">↻ Actualiser</button><button onclick="logout()">Déconnexion</button></div>
- <input id="q" placeholder="Rechercher (nom, email, code)…" oninput="draw()"><div class="sub" id="cnt" style="margin-bottom:10px"></div><div id="list"></div></div>
+ <button class="p" data-a="login">Se connecter</button><div class="msg" id="lmsg"></div></main></div>
+
+<div id="app" hidden>
+ <div class="top"><h1 class="sp">Smart Market Pro · Admin</h1><button data-a="refresh">↻</button><button data-a="logout">Déconnexion</button></div>
+ <main id="view"></main>
+ <div class="tabs"><button data-a="tab" data-t="dash">📊<br>Tableau</button><button data-a="tab" data-t="shops">🏪<br>Boutiques</button><button data-a="tab" data-t="pay">💰<br>Paiements</button><button data-a="tab" data-t="rem">🔔<br>Relances</button><button data-a="tab" data-t="sys">⚙️<br>Système</button></div>
+</div>
+<div class="ov" id="fiche"></div><div id="toast"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="js/core/pwtoggle.js"></script>
 <script src="js/cloud/config.js"></script>
@@ -23,32 +44,148 @@ button{padding:9px 12px;background:var(--sur);border:1px solid var(--bd);border-
 'use strict';
 const $=id=>document.getElementById(id);
 const c=supabase.createClient(CLOUD_CONFIG.url,CLOUD_CONFIG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-let rows=[];
+const DB_LIMIT_MB=500;   // limite de l'offre gratuite Supabase (à vérifier sur supabase.com/pricing)
+let D=null,S=[],P=[],tab='dash',filt='all',sortBy='activity',cur=null,payMonth='all';
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
-function show(w){$('login').hidden=w!=='login';$('app').hidden=w!=='app'}
+const fmt=n=>String(Math.round(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
+const fd=d=>d?new Date(d).toLocaleDateString('fr-FR'):'—';
+const ago=d=>{if(!d)return'jamais';const n=Math.floor((Date.now()-new Date(d))/864e5);return n<=0?'aujourd\'hui':n===1?'hier':'il y a '+n+' j'};
+const endOf=r=>r.status==='active'||(r.status==='expired'&&r.current_period_end)?r.current_period_end:r.trial_ends_at;
+const dleft=r=>{const e=endOf(r);return e?Math.ceil((new Date(e)-Date.now())/864e5):-9999};
+const cat=r=>{if(r.suspended)return'susp';const d=dleft(r);if(r.status==='active'&&d>0)return'active';if(r.status==='trialing'&&d>0)return'trial';return'expired'};
+const badge=r=>{const k=cat(r),d=dleft(r);return k==='susp'?['sp2','Suspendu']:k==='active'?['ok','Actif · '+d+' j']:k==='trial'?['tr','Essai · '+d+' j']:['ex','Expiré']};
+const priceTxt=()=>BILLING.options.map(o=>o.label+' : '+fmt(o.price)+' F').join(' · ');
+const MSG={
+ expiring:r=>`Bonjour, votre abonnement Smart Market Pro pour « ${r.name} » se termine le ${fd(endOf(r))}. Pour continuer à synchroniser vos ventes sans interruption, vous pouvez renouveler : ${priceTxt()}. N'hésitez pas si vous avez besoin d'aide 🙏`,
+ trial:r=>`Bonjour, votre essai gratuit de Smart Market Pro pour « ${r.name} » se termine le ${fd(endOf(r))}. Il vous convient ? Pour continuer : ${priceTxt()}. Je reste disponible pour toute question.`,
+ expired:r=>`Bonjour, l'abonnement de « ${r.name} » est terminé. Vos données restent sur votre appareil et chez nous pendant ${LEGAL.retentionDays} jours. Pour reprendre la synchronisation : ${priceTxt()}.`,
+ idle:r=>`Bonjour, vous avez créé « ${r.name} » sur Smart Market Pro. Avez-vous besoin d'un coup de main pour démarrer (ajouter vos produits, faire une première vente) ? Je peux vous guider par WhatsApp.`,
+ hello:r=>`Bonjour, c'est l'équipe Smart Market Pro à propos de « ${r.name} ».`
+};
+const waBtn=(r,kind)=>r.whatsapp?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${esc(r.whatsapp)}?text=${encodeURIComponent(MSG[kind](r))}">💬 WhatsApp</a>`:`<button data-a="copy" data-v="${esc(r.owner_email)}">📋 Copier l'email</button>`;
+function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
+async function rpc(n,a){const{data,error}=await c.rpc(n,a||{});if(error)throw error;return data}
+async function guard(fn){try{await fn()}catch(e){toast('Erreur : '+(e.message||e))}}
+
+/* ---------- connexion ---------- */
 async function init(){const{data}=await c.auth.getSession();data.session?load():show('login')}
-async function login(){$('lmsg').textContent='';const{error}=await c.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});
- if(error){$('lmsg').textContent='Email ou mot de passe incorrect.';return}load()}
-async function logout(){await c.auth.signOut();show('login')}
-async function load(){const{data,error}=await c.rpc('admin_list_shops');
- if(error){const s=(await c.auth.getSession()).data.session,em=s&&s.user?s.user.email:'?',m=String(error.message||'');
-  show('login');$('lmsg').textContent=/refus/i.test(m)?'Accès refusé : le compte « '+em+' » n\'est pas déclaré administrateur.'
-   :/does not exist|schema cache|Could not find/i.test(m)?'Le script SQL « abonnement » n\'a pas été lancé dans Supabase.':'Erreur : '+m;return}
- rows=data||[];show('app');draw()}
-function info(r){const end=new Date(r.status==='active'?r.current_period_end:r.trial_ends_at),d=Math.ceil((end-Date.now())/864e5);
- if(r.status==='active'&&d>0)return['ok','Actif · '+d+' j'];if(r.status==='trialing'&&d>0)return['tr','Essai · '+d+' j'];return['ex','Expiré']}
-function draw(){const q=$('q').value.toLowerCase().trim();
- const f=rows.filter(r=>(r.name+' '+r.owner_email+' '+r.shop_id).toLowerCase().includes(q));
- $('cnt').textContent=f.length+' boutique(s) sur '+rows.length;
- $('list').innerHTML=f.map(r=>{const[k,t]=info(r),act=r.last_activity?new Date(r.last_activity).toLocaleDateString('fr-FR'):'—';
-  return '<div class="card"><div class="row"><div class="sp"><div class="name">'+esc(r.name)+'</div><div class="sub">'+esc(r.owner_email)+' · code '+esc(r.shop_id.slice(0,8).toUpperCase())+'</div>'+
-  '<div class="sub">'+r.members+' membre(s) · dernière activité '+act+'</div></div><span class="b '+k+'">'+t+'</span></div><div class="acts">'+
-  BILLING.options.map(o=>'<button onclick="activate(\''+r.shop_id+'\','+o.months+','+o.price+')">+ '+esc(o.label)+'</button>').join('')+'</div></div>'}).join('')}
-async function activate(id,months,price){const r=rows.find(x=>x.shop_id===id);
- const ref=prompt('Paiement reçu de « '+r.name+' » : '+months+' mois, '+fmt(price)+' F.\nMoyen et référence (ex : MTN 0197… réf 12345) — facultatif :','');
- if(ref===null)return;
- const{error}=await c.rpc('admin_activate',{p_shop:id,p_months:months,p_amount:price,p_method:ref,p_ref:null});
- if(error){alert('Erreur : '+error.message);return}await load()}
+function show(w){$('login').hidden=w!=='login';$('app').hidden=w!=='app'}
+async function load(){
+ try{D=await rpc('admin_dashboard');S=await rpc('admin_list_shops')||[];show('app');render()}
+ catch(e){const s=(await c.auth.getSession()).data.session,em=s&&s.user?s.user.email:'?',m=String(e.message||'');show('login');
+  $('lmsg').textContent=/refus/i.test(m)?'Accès refusé : le compte « '+em+' » n\'est pas déclaré administrateur.':/does not exist|schema cache|Could not find/i.test(m)?'Le script SQL « console d\'administration » n\'a pas été lancé dans Supabase.':'Erreur : '+m}
+}
+
+/* ---------- affichage ---------- */
+function render(){
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+ ({dash:vDash,shops:vShops,pay:vPay,rem:vRem,sys:vSys})[tab]();window.scrollTo(0,0);
+}
+function vDash(){
+ const mx=Math.max(1,...D.months.map(m=>m.amount));
+ const exp=S.filter(r=>cat(r)==='active'&&dleft(r)<=7).sort((a,b)=>dleft(a)-dleft(b)).slice(0,5);
+ const rec=S.filter(r=>cat(r)==='expired').slice(0,5);
+ $('view').innerHTML=`<h2>Vue d'ensemble</h2><div class="grid">
+ <div class="kpi"><b>${D.shops}</b><span>boutiques</span></div><div class="kpi"><b style="color:var(--ac)">${D.active}</b><span>abonnements actifs</span></div>
+ <div class="kpi"><b style="color:var(--warn)">${D.trialing}</b><span>en essai</span></div><div class="kpi"><b style="color:var(--bad)">${D.expired}</b><span>expirées</span></div>
+ <div class="kpi"><b>${D.new_7d}</b><span>nouvelles (7 jours)</span></div><div class="kpi"><b>${D.new_30d}</b><span>nouvelles (30 jours)</span></div>
+ <div class="kpi"><b>${fmt(D.revenue_month)} F</b><span>encaissé ce mois</span></div><div class="kpi"><b>${fmt(D.revenue_total)} F</b><span>encaissé au total</span></div>
+ <div class="kpi"><b>${D.expiring_7d}</b><span>se terminent sous 7 j</span></div><div class="kpi"><b>${D.no_whatsapp}</b><span>sans numéro WhatsApp</span></div></div>
+ <h2>Encaissements des 6 derniers mois</h2><div class="card"><div class="bars">${D.months.map(m=>`<div class="bar"><span>${m.amount?fmt(m.amount):''}</span><i style="height:${Math.round(m.amount/mx*80)}%"></i><span>${m.m.slice(5)}/${m.m.slice(2,4)}</span></div>`).join('')}</div></div>
+ <h2>À traiter</h2>${list(exp,'expiring','Se terminent bientôt')}${list(rec,'expired','Expirées')}`;
+}
+function list(arr,kind,title){return `<div class="card"><div class="name">${title} (${arr.length})</div>${arr.length?arr.map(r=>`<div class="row" style="margin-top:8px"><div class="sp"><div class="name" data-a="open" data-id="${r.shop_id}" style="cursor:pointer">${esc(r.name)}</div><div class="sub">${esc(r.owner_email)} · ${badge(r)[1]}</div></div>${waBtn(r,kind)}</div>`).join(''):'<div class="sub">Rien à signaler.</div>'}</div>`}
+function vShops(){
+ const f=S.filter(r=>{const q=($('q')?$('q').value:'').toLowerCase().trim();if(q&&!(r.name+' '+r.owner_email+' '+r.shop_id+' '+(r.whatsapp||'')).toLowerCase().includes(q))return false;
+  if(filt==='trial')return cat(r)==='trial';if(filt==='active')return cat(r)==='active';if(filt==='expired')return cat(r)==='expired'||cat(r)==='susp';
+  if(filt==='idle')return !r.last_activity||(Date.now()-new Date(r.last_activity))>14*864e5;return true});
+ const sorters={activity:(a,b)=>new Date(b.last_activity||0)-new Date(a.last_activity||0),expiry:(a,b)=>dleft(a)-dleft(b),created:(a,b)=>new Date(b.created_at)-new Date(a.created_at),name:(a,b)=>a.name.localeCompare(b.name)};
+ f.sort(sorters[sortBy]);const keep=$('q')?$('q').value:'';
+ $('view').innerHTML=`<input id="q" placeholder="Rechercher (nom, email, WhatsApp, code)…" value="${esc(keep)}" data-a="q">
+ <div class="chips">${[['all','Toutes'],['trial','Essai'],['active','Actives'],['expired','Expirées'],['idle','Inactives 14 j']].map(([k,t])=>`<button data-a="filt" data-k="${k}" class="${filt===k?'on':''}">${t}</button>`).join('')}</div>
+ <div class="row"><select id="sortsel" style="flex:1" data-a="sort"><option value="activity">Tri : dernière activité</option><option value="expiry">Tri : fin d'abonnement</option><option value="created">Tri : date de création</option><option value="name">Tri : nom</option></select></div>
+ <div class="sub" style="margin:4px 0 8px">${f.length} boutique(s) sur ${S.length}</div>
+ ${f.map(r=>{const[k,t]=badge(r);return `<div class="card clk" data-a="open" data-id="${r.shop_id}"><div class="row"><div class="sp"><div class="name">${esc(r.name)}</div><div class="sub">${esc(r.owner_email)}${r.whatsapp?' · 💬 '+esc(r.whatsapp):''}</div></div><span class="b ${k}">${t}</span></div>
+ <div class="sub" style="margin-top:6px">👥 ${r.members} · 📦 ${r.items} produits · 🧾 ${r.sales} ventes (${r.sales_30d} sur 30 j) · activité : ${ago(r.last_activity)}</div></div>`}).join('')}`;
+ $('sortsel').value=sortBy;
+}
+async function vPay(){
+ if(!P.length)P=await rpc('admin_payments',{p_limit:2000})||[];
+ const months=[...new Set(P.map(p=>p.created_at.slice(0,7)))];
+ const f=P.filter(p=>payMonth==='all'||p.created_at.startsWith(payMonth));const tot=f.reduce((a,p)=>a+(p.amount||0),0);
+ $('view').innerHTML=`<h2>Journal des paiements</h2><div class="row"><select id="pm" style="flex:1" data-a="pm"><option value="all">Tous les mois</option>${months.map(m=>`<option value="${m}">${m}</option>`).join('')}</select><button data-a="csv" style="margin-bottom:8px">⬇ Export CSV</button></div>
+ <div class="kpi" style="margin-bottom:10px"><b>${fmt(tot)} F</b><span>${f.length} paiement(s)</span></div>
+ <div class="card" style="overflow-x:auto"><table><tr><th>Date</th><th>Boutique</th><th>Montant</th><th>Moyen / réf.</th></tr>${f.map(p=>`<tr><td>${fd(p.created_at)}</td><td>${esc(p.shop_name)}<div class="sub">${esc(p.owner_email)}</div></td><td>${fmt(p.amount)} F<div class="sub">${p.months?p.months+' mois':'offert'}</div></td><td>${esc(p.method||'')} ${esc(p.reference||'')}</td></tr>`).join('')||'<tr><td colspan="4" class="sub">Aucun paiement.</td></tr>'}</table></div>`;
+ $('pm').value=payMonth;
+}
+function vRem(){
+ const seg=[['Abonnements qui se terminent sous 7 jours',S.filter(r=>cat(r)==='active'&&dleft(r)<=7),'expiring'],
+  ['Essais qui se terminent sous 3 jours',S.filter(r=>cat(r)==='trial'&&dleft(r)<=3),'trial'],
+  ['Expirés depuis moins de 30 jours',S.filter(r=>cat(r)==='expired'&&dleft(r)>-30&&dleft(r)<=0),'expired'],
+  ['Inscrits depuis plus de 3 jours, sans aucune donnée',S.filter(r=>cat(r)!=='expired'&&!r.items&&!r.sales&&(Date.now()-new Date(r.created_at))>3*864e5),'idle']];
+ $('view').innerHTML='<h2>Relances</h2>'+seg.map(([t,a,k])=>`<div class="card"><div class="name">${t} (${a.length})</div>${a.map(r=>`<div class="row" style="margin-top:8px"><div class="sp"><div class="name" data-a="open" data-id="${r.shop_id}" style="cursor:pointer">${esc(r.name)}</div><div class="sub">${esc(r.owner_email)} · ${badge(r)[1]}</div></div>${waBtn(r,k)}</div>`).join('')||'<div class="sub" style="margin-top:6px">Personne.</div>'}</div>`).join('');
+}
+function vSys(){
+ const mb=D.db_bytes/1048576,pc=Math.min(100,mb/DB_LIMIT_MB*100),col=pc>80?'var(--bad)':pc>60?'var(--warn)':'var(--ac)';
+ $('view').innerHTML=`<h2>Santé de la base de données</h2><div class="card"><div class="row"><b class="sp">${mb.toFixed(1)} Mo utilisés</b><span class="sub">sur ${DB_LIMIT_MB} Mo (offre gratuite)</span></div>
+ <div class="pbar" style="margin:8px 0"><i style="width:${pc}%;background:${col}"></i></div><div class="sub">${pc>80?'⚠ Pense à passer à l\'offre payante de Supabase.':pc>60?'Surveille : plus de 60 % utilisés.':'Tout va bien.'}</div></div>
+ <div class="grid"><div class="kpi"><b>${D.users}</b><span>comptes utilisateurs</span></div><div class="kpi"><b>${D.shops}</b><span>boutiques</span></div><div class="kpi"><b>${fmt(D.records_count)}</b><span>enregistrements</span></div><div class="kpi"><b>${(D.records_bytes/1048576).toFixed(1)} Mo</b><span>table des données</span></div></div>
+ <h2>Raccourcis</h2><div class="card"><a class="wa" style="background:var(--sur2)" target="_blank" rel="noopener" href="https://supabase.com/dashboard/project/${CLOUD_CONFIG.projectRef}">Ouvrir Supabase</a></div>`;
+}
+
+/* ---------- fiche boutique ---------- */
+async function openShop(id){
+ cur=S.find(r=>r.shop_id===id);const o=$('fiche');o.classList.add('on');o.innerHTML='<main><div class="sub">Chargement…</div></main>';
+ try{const d=await rpc('admin_shop_detail',{p_shop:id});drawFiche(d)}catch(e){o.innerHTML='<main><button data-a="close">← Retour</button><div class="msg">'+esc(e.message)+'</div></main>'}
+}
+function drawFiche(d){
+ const r=cur,[k,t]=badge(r),cn=d.counts,mx=Math.max(1,...d.days.map(x=>x.amount));
+ $('fiche').innerHTML=`<main><div class="row"><button data-a="close">← Retour</button><div class="sp"></div><span class="b ${k}">${t}</span></div>
+ <h1 style="margin:12px 0 2px">${esc(r.name)}</h1><div class="sub">${esc(r.owner_email)} · créée le ${fd(r.created_at)} · code ${esc(r.shop_id.slice(0,8).toUpperCase())}</div>
+ <div class="acts">${waBtn(r,'hello')}<button data-a="copy" data-v="${esc(r.owner_email)}">📋 Email</button></div>
+ <div class="sub" style="margin-top:6px">${r.whatsapp?'💬 '+esc(r.whatsapp):'⚠ Pas de numéro WhatsApp'}</div>
+ <h2>Abonnement</h2><div class="card"><div class="sub">Fin : ${fd(endOf(r))} · ${r.status==='trialing'?'période d\'essai':r.status==='active'?'abonnement payé':'terminé'}</div>
+ <div class="acts">${BILLING.options.map(o=>`<button data-a="activate" data-m="${o.months}" data-p="${o.price}">+ ${esc(o.label)}</button>`).join('')}
+ <button data-a="grant">🎁 Offrir des jours</button><button data-a="setend">📅 Fixer la fin</button><button class="d" data-a="suspend">⛔ Suspendre</button></div></div>
+ <h2>Activité</h2><div class="grid"><div class="kpi"><b>${d.members.length}</b><span>membres${d.pending_codes?` (+${d.pending_codes} code)`:''}</span></div><div class="kpi"><b>${cn.items}</b><span>produits</span></div>
+ <div class="kpi"><b>${cn.sales}</b><span>ventes</span></div><div class="kpi"><b>${fmt(cn.sales_total)} F</b><span>chiffre d'affaires</span></div>
+ <div class="kpi"><b>${cn.expenses}</b><span>dépenses</span></div><div class="kpi"><b>${fmt(cn.debts)} F</b><span>dettes clients</span></div>
+ <div class="kpi"><b>${fmt(d.stock.units)}</b><span>unités en stock</span></div><div class="kpi"><b>${fmt(d.stock.value)} F</b><span>valeur du stock (achat)</span></div></div>
+ <h2>Ventes des 14 derniers jours</h2><div class="card"><div class="bars">${d.days.length?d.days.map(x=>`<div class="bar"><span>${x.n}</span><i style="height:${Math.round(x.amount/mx*80)}%"></i><span>${x.d.slice(8)}</span></div>`).join(''):'<div class="sub">Aucune vente récente.</div>'}</div></div>
+ <h2>Membres</h2><div class="card">${d.members.map(m=>`<div class="row" style="margin:6px 0"><div class="sp"><div class="name">${esc(m.name||m.email)}</div><div class="sub">${esc(m.email)} · dernière connexion : ${ago(m.last_login)}</div></div><span class="b ok">${({owner:'Propriétaire',manager:'Gérant',seller:'Vendeur'})[m.role]||m.role}</span></div>`).join('')}</div>
+ <h2>Paiements</h2><div class="card">${d.payments.map(p=>`<div class="row" style="margin:6px 0"><div class="sp"><div class="name">${fmt(p.amount)} F · ${p.months?p.months+' mois':'offert'}</div><div class="sub">${fd(p.at)} · ${esc(p.method||'')} ${esc(p.ref||'')}</div></div><button class="d" data-a="cancelpay" data-id="${p.id}">Annuler</button></div>`).join('')||'<div class="sub">Aucun paiement.</div>'}</div>
+ <h2>Notes internes</h2><textarea id="notes" rows="4" placeholder="Ex : pilote, a promis de payer vendredi…">${esc(d.notes||'')}</textarea><button class="p" data-a="savenotes">Enregistrer la note</button></main>`;
+}
+async function refreshFiche(){const id=cur.shop_id;S=await rpc('admin_list_shops')||[];D=await rpc('admin_dashboard');P=[];cur=S.find(r=>r.shop_id===id);await openShop(id)}
+
+/* ---------- actions ---------- */
+const A={
+ async login(){$('lmsg').textContent='';const{error}=await c.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});if(error){$('lmsg').textContent='Email ou mot de passe incorrect.';return}load()},
+ async logout(){await c.auth.signOut();show('login')},
+ refresh(){P=[];load()},
+ tab(d){tab=d.t;render()},
+ filt(d){filt=d.k;vShops()}, sort(){sortBy=$('sortsel').value;vShops()}, q(){vShops();const q=$('q');q.focus();q.setSelectionRange(q.value.length,q.value.length)},
+ pm(){payMonth=$('pm').value;vPay()},
+ open(d){openShop(d.id)}, close(){$('fiche').classList.remove('on');$('fiche').innerHTML='';render()},
+ copy(d){navigator.clipboard?navigator.clipboard.writeText(d.v).then(()=>toast('Copié')):prompt('Copier :',d.v)},
+ csv(){const f=P.filter(p=>payMonth==='all'||p.created_at.startsWith(payMonth));const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const t='\ufeff'+['Date;Boutique;Email;Mois;Montant;Moyen;Reference'].concat(f.map(p=>[fd(p.created_at),p.shop_name,p.owner_email,p.months,p.amount,p.method,p.reference].map(q).join(';'))).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='paiements-'+payMonth+'.csv';a.click()},
+ async activate(d){const ref=prompt('Paiement reçu de « '+cur.name+' » : '+d.m+' mois, '+fmt(d.p)+' F.\nMoyen et référence (ex : MTN 0197… réf 12345), facultatif :','');if(ref===null)return;
+  await rpc('admin_activate',{p_shop:cur.shop_id,p_months:+d.m,p_amount:+d.p,p_method:ref,p_ref:null});toast('Abonnement activé ✔');await refreshFiche()},
+ async grant(){const n=prompt('Combien de jours offrir à « '+cur.name+' » ?','7');if(n===null)return;const note=prompt('Raison (facultatif) :','')||'';
+  await rpc('admin_grant_days',{p_shop:cur.shop_id,p_days:parseInt(n,10),p_note:note});toast('Jours offerts ✔');await refreshFiche()},
+ async setend(){const v=prompt('Nouvelle date de fin pour « '+cur.name+' »\nFormat AAAA-MM-JJ (une date passée = abonnement terminé) :',(endOf(cur)||'').slice(0,10));if(!v)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){toast('Format invalide');return}await rpc('admin_set_end',{p_shop:cur.shop_id,p_end:v+'T23:59:59+00:00'});toast('Date mise à jour ✔');await refreshFiche()},
+ async suspend(){if(!confirm('Suspendre « '+cur.name+' » ? La synchronisation s\'arrête (les données restent sur ses appareils).'))return;
+  await rpc('admin_suspend',{p_shop:cur.shop_id});toast('Boutique suspendue');await refreshFiche()},
+ async cancelpay(d){if(!confirm('Annuler ce paiement ? S\'il avait ajouté des mois, ils sont retirés de l\'abonnement.'))return;
+  await rpc('admin_cancel_payment',{p_id:+d.id});toast('Paiement annulé');await refreshFiche()},
+ async savenotes(){await rpc('admin_set_notes',{p_shop:cur.shop_id,p_notes:$('notes').value});toast('Note enregistrée ✔')}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;const f=A[b.dataset.a];if(f)guard(()=>f(b.dataset))});
+document.addEventListener('change',e=>{const b=e.target.closest('select[data-a]');if(b)guard(()=>A[b.dataset.a](b.dataset))});
+document.addEventListener('input',e=>{if(e.target.matches('input[data-a="q"]'))A.q()});
+const _render=render;render=function(){if(tab==='pay')return guard(vPay),document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='pay'));return _render()};
 init();
 </script></body></html>

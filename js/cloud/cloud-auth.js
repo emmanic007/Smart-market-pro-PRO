@@ -169,18 +169,32 @@ const CloudAuth = {
   async _loadShop() {
     try {
       // Une seule boutique pour l'instant (le multi-boutiques viendra plus tard)
-      const { data, error } = await this.client.from('shop_members')
-        .select('role, display_name, shop_id, shops(id, name, currency)').eq('user_id', this.user.id).limit(1);
+      const sel = cols => this.client.from('shop_members').select('role, display_name, shop_id, shops(' + cols + ')').eq('user_id', this.user.id).limit(1);
+      let q = await sel('id, name, currency, whatsapp');
+      if (q.error && /whatsapp/i.test(String(q.error.message))) q = await sel('id, name, currency');   // base pas encore mise à jour
+      const { data, error } = q;
       if (error) throw error;
       if (!data || !data.length) return false;
       const m = data[0], sh = m.shops || {};
       this._saveCtx({ userId: this.user.id, email: this.user.email, shopId: m.shop_id,
-        shopName: sh.name || '', currency: sh.currency || 'F', role: m.role, displayName: m.display_name || '' });
+        shopName: sh.name || '', currency: sh.currency || 'F', role: m.role, displayName: m.display_name || '', whatsapp: sh.whatsapp || '' });
       return true;
     } catch (e) {
       console.warn('[Cloud] loadShop', e);
       return (this.ctx && this.ctx.userId === this.user.id && this.ctx.shopId) ? true : null;
     }
+  },
+  normPhone(raw) {      // chiffres seulement ; numéros béninois (01 + 8 chiffres) complétés avec l'indicatif 229
+    let d = String(raw || '').replace(/\D/g, '');
+    if (d.indexOf('00') === 0) d = d.slice(2);
+    if (d.length === 10 && d.indexOf('01') === 0) d = '229' + d;
+    else if (d.length === 8) d = '22901' + d;
+    return d;
+  },
+  fmtPhone(d) {
+    d = String(d || '');
+    if (d.indexOf('229') === 0 && d.length === 13) return '+229 ' + d.slice(3).replace(/(\d{2})(?=\d)/g, '$1 ');
+    return d ? '+' + d : '';
   },
   shopTab(t) {
     document.getElementById('cloud-tab-new').classList.toggle('on', t === 'new');
@@ -205,7 +219,11 @@ const CloudAuth = {
     if (name.length < 2) return this._msg('Donnez un nom à votre boutique.');
     this._busy(true);
     try {
-      const { error } = await this.client.rpc('create_shop', { p_name: name, p_currency: 'F' });
+      const wa = this.normPhone(document.getElementById('cloud-wa').value);
+      if (wa && (wa.length < 8 || wa.length > 15)) { this._busy(false); return this._msg('Numéro WhatsApp invalide (exemple : 01 61 15 61 06).'); }
+      let { error } = await this.client.rpc('create_shop', { p_name: name, p_currency: 'F', p_whatsapp: wa || null });
+      if (error && /p_whatsapp|Could not find the function/i.test(String(error.message)))        // base pas encore mise à jour
+        ({ error } = await this.client.rpc('create_shop', { p_name: name, p_currency: 'F' }));
       if (error) throw error;
       await this._afterAuth();
     } catch (e) { this._msg(this._err(e)); }
@@ -341,6 +359,8 @@ const CloudAuth = {
         '<button id="cloud-tab-code" onclick="CloudAuth.shopTab(\'code\')">J\'ai un code</button></div>' +
         '<div id="cloud-pane-new"><div class="cloud-hint">Nommez votre boutique. 14 jours d\'essai gratuit.</div>' +
         '<input id="cloud-shop" type="text" placeholder="Nom de la boutique" maxlength="60">' +
+        '<div class="cloud-wa">💬 <b>Ajoutez votre WhatsApp</b> : nous vous aidons en quelques minutes en cas de souci et nous vous prévenons avant la fin de votre abonnement, pour que vous ne perdiez jamais votre synchronisation. Pas de spam, jamais partagé.</div>' +
+        '<input id="cloud-wa" type="tel" inputmode="tel" placeholder="Votre numéro WhatsApp (facultatif)" maxlength="20">' +
         '<button class="btn btn-primary" onclick="CloudAuth.createShop()">Créer ma boutique</button></div>' +
         '<div id="cloud-pane-code" style="display:none"><div class="cloud-hint">Saisissez le code d\'invitation reçu de votre patron (par WhatsApp).</div>' +
         '<input id="cloud-code" type="text" placeholder="CODE D\'INVITATION" maxlength="16" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.15em;text-align:center">' +

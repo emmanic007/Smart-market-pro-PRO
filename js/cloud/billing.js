@@ -34,9 +34,26 @@ const Billing = {
   },
   render() {
     const d = this._el('billing-card'); if (!d) return;
+    const wa = (CloudAuth.ctx && CloudAuth.ctx.whatsapp) || '';
     d.innerHTML = '<div class="ct-title">💳 Abonnement</div><div class="ct-hint" id="bill-status"></div>' +
+      '<div class="ct-hint">💬 ' + (wa
+        ? 'WhatsApp : <b>' + Utils.esc(CloudAuth.fmtPhone(wa)) + '</b> · <a href="#" onclick="Billing.editWa();return false">Modifier</a>'
+        : '<b>Ajoutez votre WhatsApp</b> : nous vous aidons en quelques minutes en cas de souci et nous vous prévenons avant la fin de votre abonnement. Pas de spam, jamais partagé. <a href="#" onclick="Billing.editWa();return false">Ajouter mon numéro</a>') + '</div>' +
       '<button class="btn btn-primary" onclick="Billing.open()">Payer / Renouveler</button>';
     this._el('bill-status').textContent = this.statusText();
+  },
+  async editWa() {
+    const cur = (CloudAuth.ctx && CloudAuth.ctx.whatsapp) || '';
+    const v = prompt('Votre numéro WhatsApp (exemple : 01 61 15 61 06).\nNous vous aidons en cas de souci et nous vous prévenons avant la fin de votre abonnement. Jamais de spam.', cur ? CloudAuth.fmtPhone(cur) : '');
+    if (v === null) return;
+    const d = CloudAuth.normPhone(v);
+    if (d && (d.length < 8 || d.length > 15)) return UI.toast('Numéro invalide', 'danger');
+    try {
+      const { error } = await CloudAuth.client.rpc('set_shop_whatsapp', { p_shop: CloudAuth.ctx.shopId, p_whatsapp: d || null });
+      if (error) throw error;
+      CloudAuth._saveCtx(Object.assign({}, CloudAuth.ctx, { whatsapp: d }));
+      this.render(); UI.toast('Numéro enregistré ✔', 'success');
+    } catch (e) { UI.toast(CloudAuth._err(e), 'danger'); }
   },
   onStatus() {    // appelé après chaque synchronisation
     this.render();

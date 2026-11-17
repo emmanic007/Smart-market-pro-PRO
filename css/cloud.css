@@ -36,3 +36,5 @@
 #cloud-overlay .cloud-agree input{-webkit-appearance:checkbox;appearance:auto;width:20px;height:20px;margin:0;padding:0;flex:none;accent-color:var(--accent);border:1px solid var(--accent);cursor:pointer}
 #cloud-overlay .cloud-agree a,.cloud-legal a{color:var(--accent)}
 .cloud-legal{text-align:center;margin-top:14px;font-family:var(--fm);font-size:.64rem;color:var(--text3)}
+.cloud-wa{font-family:var(--fm);font-size:.72rem;line-height:1.55;color:var(--text2);background:rgba(46,230,166,.07);border:1px solid var(--border);border-radius:var(--rmd);padding:10px 12px;margin:0 0 8px}
+.cloud-wa b{color:var(--accent)}
