@@ -30,16 +30,19 @@ table{width:100%;border-collapse:collapse;font-size:.82rem}td,th{padding:8px 6px
  <input id="em" type="email" placeholder="Email administrateur"><input id="pw" type="password" placeholder="Mot de passe">
  <button class="p" data-a="login">Se connecter</button><div class="msg" id="lmsg"></div></main></div>
 
+<div id="mfa" hidden><main style="max-width:420px;padding-top:50px"><h1>Vérification en deux étapes</h1><div id="mfabody"></div></main></div>
+
 <div id="app" hidden>
  <div class="top"><h1 class="sp">Smart Market Pro · Admin</h1><button data-a="refresh">↻</button><button data-a="logout">Déconnexion</button></div>
  <main id="view"></main>
- <div class="tabs"><button data-a="tab" data-t="dash">📊<br>Tableau</button><button data-a="tab" data-t="shops">🏪<br>Boutiques</button><button data-a="tab" data-t="pay">💰<br>Paiements</button><button data-a="tab" data-t="rem">🔔<br>Relances</button><button data-a="tab" data-t="sys">⚙️<br>Système</button></div>
+ <div class="tabs"><button data-a="tab" data-t="dash">📊<br>Tableau</button><button data-a="tab" data-t="shops">🏪<br>Boutiques</button><button data-a="tab" data-t="pay">💰<br>Paiements</button><button data-a="tab" data-t="rem">🔔<br>Relances</button><button data-a="tab" data-t="sys">⚙️<br>Plus</button></div>
 </div>
 <div class="ov" id="fiche"></div><div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="js/core/pwtoggle.js"></script>
 <script src="js/cloud/config.js"></script>
+<script src="js/cloud/platform.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -69,17 +72,23 @@ async function guard(fn){try{await fn()}catch(e){toast('Erreur : '+(e.message||e
 
 /* ---------- connexion ---------- */
 async function init(){const{data}=await c.auth.getSession();data.session?load():show('login')}
-function show(w){$('login').hidden=w!=='login';$('app').hidden=w!=='app'}
+function show(w){$('login').hidden=w!=='login';$('app').hidden=w!=='app';$('mfa').hidden=w!=='mfa'}
+let ME={role:null};const SUPER=()=>ME.role==='super';
 async function load(){
- try{D=await rpc('admin_dashboard');S=await rpc('admin_list_shops')||[];show('app');render()}
- catch(e){const s=(await c.auth.getSession()).data.session,em=s&&s.user?s.user.email:'?',m=String(e.message||'');show('login');
-  $('lmsg').textContent=/refus/i.test(m)?'Accès refusé : le compte « '+em+' » n\'est pas déclaré administrateur.':/does not exist|schema cache|Could not find/i.test(m)?'Le script SQL « console d\'administration » n\'a pas été lancé dans Supabase.':'Erreur : '+m}
+ try{
+  ME=await rpc('admin_me');
+  if(!ME.role)throw{message:'Accès refusé'};
+  if(ME.mfa_required&&ME.aal!=='aal2')return mfaGate();
+  Platform.apply(await rpc('get_public_settings'));
+  D=await rpc('admin_dashboard');S=await rpc('admin_list_shops')||[];show('app');render()
+ }catch(e){const s=(await c.auth.getSession()).data.session,em=s&&s.user?s.user.email:'?',m=String(e.message||'');show('login');
+  $('lmsg').textContent=/refus/i.test(m)?'Accès refusé : le compte « '+em+' » n\'est pas déclaré administrateur.':/does not exist|schema cache|Could not find/i.test(m)?'Une mise à jour SQL n\'a pas été lancée dans Supabase (voir le dernier script fourni).':'Erreur : '+m}
 }
 
 /* ---------- affichage ---------- */
 function render(){
  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
- ({dash:vDash,shops:vShops,pay:vPay,rem:vRem,sys:vSys})[tab]();window.scrollTo(0,0);
+ guard(({dash:vDash,shops:vShops,pay:vPay,rem:vRem,sys:vMore})[tab]);window.scrollTo(0,0);
 }
 function vDash(){
  const mx=Math.max(1,...D.months.map(m=>m.amount));
@@ -125,9 +134,9 @@ function vRem(){
   ['Inscrits depuis plus de 3 jours, sans aucune donnée',S.filter(r=>cat(r)!=='expired'&&!r.items&&!r.sales&&(Date.now()-new Date(r.created_at))>3*864e5),'idle']];
  $('view').innerHTML='<h2>Relances</h2>'+seg.map(([t,a,k])=>`<div class="card"><div class="name">${t} (${a.length})</div>${a.map(r=>`<div class="row" style="margin-top:8px"><div class="sp"><div class="name" data-a="open" data-id="${r.shop_id}" style="cursor:pointer">${esc(r.name)}</div><div class="sub">${esc(r.owner_email)} · ${badge(r)[1]}</div></div>${waBtn(r,k)}</div>`).join('')||'<div class="sub" style="margin-top:6px">Personne.</div>'}</div>`).join('');
 }
-function vSys(){
+function vHealth(){
  const mb=D.db_bytes/1048576,pc=Math.min(100,mb/DB_LIMIT_MB*100),col=pc>80?'var(--bad)':pc>60?'var(--warn)':'var(--ac)';
- $('view').innerHTML=`<h2>Santé de la base de données</h2><div class="card"><div class="row"><b class="sp">${mb.toFixed(1)} Mo utilisés</b><span class="sub">sur ${DB_LIMIT_MB} Mo (offre gratuite)</span></div>
+ $('sv').innerHTML=`<h2>Santé de la base de données</h2><div class="card"><div class="row"><b class="sp">${mb.toFixed(1)} Mo utilisés</b><span class="sub">sur ${DB_LIMIT_MB} Mo (offre gratuite)</span></div>
  <div class="pbar" style="margin:8px 0"><i style="width:${pc}%;background:${col}"></i></div><div class="sub">${pc>80?'⚠ Pense à passer à l\'offre payante de Supabase.':pc>60?'Surveille : plus de 60 % utilisés.':'Tout va bien.'}</div></div>
  <div class="grid"><div class="kpi"><b>${D.users}</b><span>comptes utilisateurs</span></div><div class="kpi"><b>${D.shops}</b><span>boutiques</span></div><div class="kpi"><b>${fmt(D.records_count)}</b><span>enregistrements</span></div><div class="kpi"><b>${(D.records_bytes/1048576).toFixed(1)} Mo</b><span>table des données</span></div></div>
  <h2>Raccourcis</h2><div class="card"><a class="wa" style="background:var(--sur2)" target="_blank" rel="noopener" href="https://supabase.com/dashboard/project/${CLOUD_CONFIG.projectRef}">Ouvrir Supabase</a></div>`;
@@ -146,15 +155,15 @@ function drawFiche(d){
  <div class="sub" style="margin-top:6px">${r.whatsapp?'💬 '+esc(r.whatsapp):'⚠ Pas de numéro WhatsApp'}</div>
  <h2>Abonnement</h2><div class="card"><div class="sub">Fin : ${fd(endOf(r))} · ${r.status==='trialing'?'période d\'essai':r.status==='active'?'abonnement payé':'terminé'}</div>
  <div class="acts">${BILLING.options.map(o=>`<button data-a="activate" data-m="${o.months}" data-p="${o.price}">+ ${esc(o.label)}</button>`).join('')}
- <button data-a="grant">🎁 Offrir des jours</button><button data-a="setend">📅 Fixer la fin</button><button class="d" data-a="suspend">⛔ Suspendre</button></div></div>
+ <button data-a="grant">🎁 Offrir des jours</button>${SUPER()?'<button data-a="setend">📅 Fixer la fin</button><button class="d" data-a="suspend">⛔ Suspendre</button>':''}</div></div>
  <h2>Activité</h2><div class="grid"><div class="kpi"><b>${d.members.length}</b><span>membres${d.pending_codes?` (+${d.pending_codes} code)`:''}</span></div><div class="kpi"><b>${cn.items}</b><span>produits</span></div>
  <div class="kpi"><b>${cn.sales}</b><span>ventes</span></div><div class="kpi"><b>${fmt(cn.sales_total)} F</b><span>chiffre d'affaires</span></div>
  <div class="kpi"><b>${cn.expenses}</b><span>dépenses</span></div><div class="kpi"><b>${fmt(cn.debts)} F</b><span>dettes clients</span></div>
  <div class="kpi"><b>${fmt(d.stock.units)}</b><span>unités en stock</span></div><div class="kpi"><b>${fmt(d.stock.value)} F</b><span>valeur du stock (achat)</span></div></div>
  <h2>Ventes des 14 derniers jours</h2><div class="card"><div class="bars">${d.days.length?d.days.map(x=>`<div class="bar"><span>${x.n}</span><i style="height:${Math.round(x.amount/mx*80)}%"></i><span>${x.d.slice(8)}</span></div>`).join(''):'<div class="sub">Aucune vente récente.</div>'}</div></div>
- <h2>Membres</h2><div class="card">${d.members.map(m=>`<div class="row" style="margin:6px 0"><div class="sp"><div class="name">${esc(m.name||m.email)}</div><div class="sub">${esc(m.email)} · dernière connexion : ${ago(m.last_login)}</div></div><span class="b ok">${({owner:'Propriétaire',manager:'Gérant',seller:'Vendeur'})[m.role]||m.role}</span></div>`).join('')}</div>
- <h2>Paiements</h2><div class="card">${d.payments.map(p=>`<div class="row" style="margin:6px 0"><div class="sp"><div class="name">${fmt(p.amount)} F · ${p.months?p.months+' mois':'offert'}</div><div class="sub">${fd(p.at)} · ${esc(p.method||'')} ${esc(p.ref||'')}</div></div><button class="d" data-a="cancelpay" data-id="${p.id}">Annuler</button></div>`).join('')||'<div class="sub">Aucun paiement.</div>'}</div>
- <h2>Notes internes</h2><textarea id="notes" rows="4" placeholder="Ex : pilote, a promis de payer vendredi…">${esc(d.notes||'')}</textarea><button class="p" data-a="savenotes">Enregistrer la note</button></main>`;
+ <h2>Membres</h2><div class="card">${d.members.map(m=>`<div class="row" style="margin:8px 0"><div class="sp"><div class="name">${esc(m.name||m.email)}</div><div class="sub">${esc(m.email)} · dernière connexion : ${ago(m.last_login)}</div></div><span class="b ok">${({owner:'Propriétaire',manager:'Gérant',seller:'Vendeur'})[m.role]||m.role}</span><button data-a="resetpw" data-e="${esc(m.email)}" title="Envoyer un lien de mot de passe oublié">🔑</button>${SUPER()&&m.role!=='owner'?`<button class="d" data-a="rmember" data-e="${esc(m.email)}">Retirer</button>`:''}</div>`).join('')}</div>
+ <h2>Paiements</h2><div class="card">${d.payments.map(p=>`<div class="row" style="margin:6px 0"><div class="sp"><div class="name">${fmt(p.amount)} F · ${p.months?p.months+' mois':'offert'}</div><div class="sub">${fd(p.at)} · ${esc(p.method||'')} ${esc(p.ref||'')}</div></div>${SUPER()?`<button class="d" data-a="cancelpay" data-id="${p.id}">Annuler</button>`:''}</div>`).join('')||'<div class="sub">Aucun paiement.</div>'}</div>
+ <h2>Notes internes</h2><textarea id="notes" rows="4" placeholder="Ex : pilote, a promis de payer vendredi…">${esc(d.notes||'')}</textarea><button class="p" data-a="savenotes">Enregistrer la note</button>${SUPER()?`<h2>Zone sensible</h2><div class="card"><div class="sub">Données de la boutique (droit d\'accès du client) ou suppression définitive.</div><div class="acts"><button data-a="exportshop">⬇ Exporter les données</button><button class="d" data-a="delshop">🗑 Supprimer la boutique</button></div></div>`:''}</main>`;
 }
 async function refreshFiche(){const id=cur.shop_id;S=await rpc('admin_list_shops')||[];D=await rpc('admin_dashboard');P=[];cur=S.find(r=>r.shop_id===id);await openShop(id)}
 
@@ -185,7 +194,110 @@ const A={
 };
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;const f=A[b.dataset.a];if(f)guard(()=>f(b.dataset))});
 document.addEventListener('change',e=>{const b=e.target.closest('select[data-a]');if(b)guard(()=>A[b.dataset.a](b.dataset))});
-document.addEventListener('input',e=>{if(e.target.matches('input[data-a="q"]'))A.q()});
-const _render=render;render=function(){if(tab==='pay')return guard(vPay),document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='pay'));return _render()};
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.matches('input[data-a="q"]'))return A.q();
+ if(t.dataset&&t.dataset.w&&W){const k=t.dataset.w;if(k==='wa'||k==='trial')W[k]=t.value;else{const[g,i,f]=k.split('.');W[g][+i][f]=t.value}}});
+/* ---------- Phase 2 ---------- */
+let sub=null,W=null;
+const normPhone=raw=>{let d=String(raw||'').replace(/\D/g,'');if(d.indexOf('00')===0)d=d.slice(2);if(d.length===10&&d.indexOf('01')===0)d='229'+d;else if(d.length===8)d='22901'+d;return d};
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type||'application/json'}));a.download=name;a.click()}
+const SUBS={ann:['📣 Annonces dans l\'app','Un message affiché à tous les utilisateurs'],set:['⚙️ Réglages','Tarifs, numéros de paiement, essai gratuit'],adm:['👥 Administrateurs','Ajouter ou retirer un collaborateur'],sec:['🔒 Sécurité (2FA)','Code de sécurité sur ton téléphone'],log:['📜 Journal','Qui a fait quoi, et quand'],bak:['💾 Sauvegarde complète','Télécharger les données de toutes les boutiques'],hea:['🩺 Santé de la base','Espace utilisé sur Supabase']};
+function vMore(){
+ if(sub){$('view').innerHTML='<button data-a="subback">← Retour</button><div id="sv"></div>';return({ann:vAnn,set:vSet,adm:vAdm,sec:vSec,log:vLog,bak:vBak,hea:vHealth})[sub]()}
+ const ok=SUPER()?Object.keys(SUBS):['sec','hea'];
+ $('view').innerHTML='<h2>Plus</h2>'+ok.map(k=>`<div class="card clk" data-a="sub" data-k="${k}"><div class="name">${SUBS[k][0]}</div><div class="sub">${SUBS[k][1]}</div></div>`).join('')+`<div class="sub" style="margin-top:10px">Connecté : ${esc(ME.email||'')} · ${SUPER()?'administrateur principal':'support'}</div>`;
+}
+async function vSet(){
+ const st=await rpc('admin_get_settings');
+ W={prices:JSON.parse(JSON.stringify(st.prices||BILLING.options)),methods:JSON.parse(JSON.stringify(st.methods||BILLING.methods)),wa:st.support_whatsapp||BILLING.whatsapp||'',trial:st.trial_days||14};drawSet();
+}
+function drawSet(){
+ const inp=(k,v,ph,n)=>`<input data-w="${k}" value="${esc(v)}" placeholder="${ph}"${n?' inputmode="numeric"':''}>`;
+ const row=(g,i,cells)=>`<div class="row" style="gap:6px">${cells}<button class="d" data-a="wdel" data-t="${g}" data-i="${i}" style="margin-bottom:8px">✕</button></div>`;
+ $('sv').innerHTML=`<h2>Tarifs</h2><div class="card">${W.prices.map((p,i)=>row('prices',i,`<div style="width:64px">${inp('prices.'+i+'.months',p.months,'mois',1)}</div><div style="flex:1;min-width:90px">${inp('prices.'+i+'.price',p.price,'prix (F)',1)}</div><div style="flex:2;min-width:120px">${inp('prices.'+i+'.label',p.label,'libellé')}</div>`)).join('')}<button data-a="wadd" data-t="prices">+ Ajouter une durée</button></div>
+ <h2>Numéros de paiement</h2><div class="card">${W.methods.map((m,i)=>row('methods',i,['name','number','holder'].map((f,x)=>`<div style="flex:1;min-width:100px">${inp('methods.'+i+'.'+f,m[f],['Moyen','Numéro','Titulaire'][x])}</div>`).join(''))).join('')}<button data-a="wadd" data-t="methods">+ Ajouter un moyen</button></div>
+ <h2>Autres</h2><div class="card"><div class="sub">WhatsApp qui reçoit les preuves de paiement (ex : 01 61 15 61 06)</div>${inp('wa',W.wa,'WhatsApp')}<div class="sub">Durée de l'essai gratuit (jours)</div>${inp('trial',W.trial,'14',1)}</div>
+ <button class="p" data-a="wsave">Enregistrer les réglages</button><div class="sub" style="margin-top:8px">Les changements arrivent chez tes clients à leur prochaine connexion à internet.</div>`;
+}
+async function vAnn(){
+ const a=(await rpc('get_public_settings')).announcement,live=a&&a.message&&(!a.until||Date.now()<a.until);
+ $('sv').innerHTML=`<h2>Annonce actuelle</h2><div class="card">${live?`<div class="name">${esc(a.message)}</div><div class="sub">${a.level==='warn'?'⚠ Important':'ℹ Information'} · jusqu'au ${fd(a.until)}</div><div class="acts"><button class="d" data-a="annoff">Retirer l'annonce</button></div>`:'<div class="sub">Aucune annonce affichée.</div>'}</div>
+ <h2>Nouvelle annonce</h2><textarea id="annmsg" rows="3" maxlength="300" placeholder="Ex : Maintenance ce soir à 22h. Vos ventes restent possibles hors ligne."></textarea>
+ <select id="annlvl"><option value="info">ℹ Information</option><option value="warn">⚠ Important</option></select>
+ <select id="anndays"><option value="1">Affichée 1 jour</option><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select>
+ <button class="p" data-a="annpub">Publier l'annonce</button>`;
+}
+async function vAdm(){
+ const L=await rpc('admin_list_admins');
+ $('sv').innerHTML=`<h2>Administrateurs</h2>${L.map(x=>`<div class="card"><div class="row"><div class="sp"><div class="name">${esc(x.email)}</div><div class="sub">${x.role==='super'?'Principal (tous les droits)':'Support (lecture, activation, jours offerts, notes)'} · dernière connexion ${ago(x.last_login)}</div></div>${x.email===ME.email?'<span class="b ok">Vous</span>':`<button class="d" data-a="adel" data-id="${x.user_id}">Retirer</button>`}</div></div>`).join('')}
+ <h2>Ajouter</h2><div class="sub" style="margin-bottom:6px">La personne doit d'abord créer un compte Smart Market Pro avec son email.</div><input id="admemail" type="email" placeholder="Email du collaborateur"><select id="admrole"><option value="support">Support (droits limités)</option><option value="super">Principal (tous les droits)</option></select><button class="p" data-a="aadd">Ajouter</button>`;
+}
+async function vLog(){
+ const L=await rpc('admin_log_list',{p_limit:300});
+ $('sv').innerHTML='<h2>Journal des actions</h2><div class="card" style="overflow-x:auto"><table><tr><th>Quand</th><th>Qui</th><th>Action</th></tr>'+(L.map(l=>`<tr><td>${new Date(l.at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}</td><td>${esc((l.admin_email||'').split('@')[0])}</td><td>${esc(l.action)}${l.shop_name?' · <b>'+esc(l.shop_name)+'</b>':''}<div class="sub">${esc(l.detail||'')}</div></td></tr>`).join('')||'<tr><td colspan="3" class="sub">Rien pour l\'instant.</td></tr>')+'</table></div>';
+}
+function vBak(){
+ $('sv').innerHTML=`<h2>Sauvegarde complète</h2><div class="card"><div class="sub">Télécharge un fichier avec les données de <b>toutes</b> les boutiques (produits, ventes, stock, membres, paiements). L'offre gratuite de Supabase n'a pas de sauvegarde automatique : fais-la <b>chaque semaine</b> et garde le fichier en lieu sûr (téléphone + ordinateur).</div>
+ <div class="acts"><button class="p" data-a="bakgo">⬇ Télécharger la sauvegarde (${S.length} boutiques)</button></div><div class="sub" id="bakstat" style="margin-top:8px"></div></div>`;
+}
+async function vSec(){
+ const {data:f}=await c.auth.mfa.listFactors(),t=(f.totp||[]).find(x=>x.status==='verified');
+ const st=SUPER()?await rpc('admin_get_settings').catch(()=>({})):{},req=!!st.admin_mfa_required;
+ $('sv').innerHTML=`<h2>Double authentification (2FA)</h2><div class="card"><div class="name">${t?'✅ Activée sur ton compte':'❌ Pas encore activée'}</div>
+ <div class="sub" style="margin:6px 0">Un code à 6 chiffres, changé toutes les 30 secondes par une application (Google Authenticator, Microsoft Authenticator, Authy…), protège l'accès à l'administration même si ton mot de passe est volé.</div>
+ ${t?'':'<div class="acts"><button class="p" data-a="newfactor">Activer la double authentification</button></div><div class="sub" style="margin-top:8px">⚠ Quand tu valides, tes autres connexions à ce compte (téléphone, ordinateur) sont déconnectées : il faudra te reconnecter.</div>'}</div>
+ ${SUPER()?`<h2>Exiger le code</h2><div class="card"><div class="name">${req?'🔒 Le code est exigé':'🔓 Le code n\'est pas exigé'}</div><div class="sub" style="margin:6px 0">Quand c'est exigé, plus personne n'accède à l'administration sans son code, même avec le bon mot de passe.${ME.aal==='aal2'?'':' (Connecte-toi d\'abord avec ton code pour pouvoir l\'activer.)'}</div>
+ <div class="acts"><button ${req?'class="d"':''} data-a="mfareq" data-v="${req?0:1}" ${!req&&(!t||ME.aal!=='aal2')?'disabled':''}>${req?'Ne plus exiger':'Exiger le code'}</button></div>
+ <div class="sub" style="margin-top:10px">Si tu perds ton téléphone : Supabase › SQL Editor › <code>update public.platform_settings set value = 'false'::jsonb where key = 'admin_mfa_required';</code></div></div>`:''}`;
+}
+async function mfaGate(){
+ show('mfa');const B=$('mfabody'),{data:f}=await c.auth.mfa.listFactors(),t=(f.totp||[]).find(x=>x.status==='verified');
+ if(t){B.innerHTML=`<div class="sub" style="margin:8px 0 12px">Entrez le code à 6 chiffres de votre application d'authentification.</div><input id="mcode" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"><button class="p" data-a="mverify" data-f="${t.id}">Valider</button><div class="msg" id="mmsg"></div><button data-a="mcancel">Annuler</button>`;return}
+ await enrollUI();
+}
+async function enrollUI(){
+ const B=$('mfabody'),{data:f}=await c.auth.mfa.listFactors();
+ for(const x of (f.all||[]).filter(x=>x.status==='unverified'))await c.auth.mfa.unenroll({factorId:x.id});
+ const{data,error}=await c.auth.mfa.enroll({factorType:'totp',friendlyName:'Admin SMP '+Date.now()});
+ if(error){B.innerHTML='<div class="msg">'+esc(error.message)+'</div><button data-a="mcancel">Retour</button>';return}
+ B.innerHTML=`<div class="sub" style="margin:8px 0">1. Installe une application d'authentification (Google Authenticator, Microsoft Authenticator, Authy…).<br>2. Scanne ce code, ou saisis la clé.<br>3. Entre le code à 6 chiffres affiché.</div>
+ <div class="card" style="text-align:center"><img src="${data.totp.qr_code}" alt="QR" style="width:200px;height:200px;background:#fff;padding:6px;border-radius:8px"><div class="sub" style="word-break:break-all;margin-top:8px">${esc(data.totp.secret)}</div></div>
+ <input id="mcode" inputmode="numeric" maxlength="6" placeholder="123456"><button class="p" data-a="mverify" data-f="${data.id}">Activer</button><div class="msg" id="mmsg"></div>
+ <div class="sub">⚠ Tes autres connexions à ce compte seront déconnectées : il faudra te reconnecter.</div><button data-a="mcancel" style="margin-top:8px">Annuler</button>`;
+}
+Object.assign(A,{
+ sub(d){sub=d.k;render()}, subback(){sub=null;render()},
+ wadd(d){if(W[d.t].length>=6)return toast('6 maximum');W[d.t].push(d.t==='prices'?{months:'',price:'',label:''}:{name:'',number:'',holder:''});drawSet()},
+ wdel(d){W[d.t].splice(+d.i,1);drawSet()},
+ async wsave(){
+  const prices=W.prices.map(p=>({months:parseInt(p.months,10),price:parseInt(p.price,10),label:String(p.label||'').trim()||(parseInt(p.months,10)+' mois')}));
+  if(!prices.length||prices.some(p=>!(p.months>0)||!(p.price>=0)))return toast('Vérifie les durées et les prix');
+  const methods=W.methods.filter(m=>(m.name||'').trim()||(m.number||'').trim()).map(m=>({name:(m.name||'').trim(),number:(m.number||'').trim(),holder:(m.holder||'').trim()}));
+  const wa=normPhone(W.wa),trial=parseInt(W.trial,10);
+  if(wa&&(wa.length<8||wa.length>15))return toast('Numéro WhatsApp invalide');
+  if(!(trial>=1&&trial<=90))return toast('Essai : de 1 à 90 jours');
+  await rpc('admin_set_settings',{p_settings:{prices,methods,support_whatsapp:wa||null,trial_days:trial}});
+  Platform.apply({prices,methods,support_whatsapp:wa||undefined,trial_days:trial});toast('Réglages enregistrés ✔')},
+ async annpub(){const m=$('annmsg').value.trim();if(!m)return toast('Écris ton message');const days=+$('anndays').value;
+  await rpc('admin_set_settings',{p_settings:{announcement:{id:Date.now(),message:m,level:$('annlvl').value,until:Date.now()+days*864e5}}});toast('Annonce publiée ✔');vMore()},
+ async annoff(){await rpc('admin_set_settings',{p_settings:{announcement:null}});toast('Annonce retirée');vMore()},
+ async aadd(){const e=$('admemail').value.trim();if(!e)return;await rpc('admin_add_admin',{p_email:e,p_role:$('admrole').value});toast('Administrateur ajouté ✔');vMore()},
+ async adel(d){if(!confirm('Retirer cet administrateur ?'))return;await rpc('admin_remove_admin',{p_user:d.id});toast('Retiré');vMore()},
+ async bakgo(){const out={exported_at:new Date().toISOString(),settings:await rpc('admin_get_settings'),shops:[]},b=$('bakstat');
+  for(let i=0;i<S.length;i++){b.textContent='Boutique '+(i+1)+' / '+S.length+' : '+S[i].name+'…';out.shops.push(await rpc('admin_export_shop',{p_shop:S[i].shop_id,p_audit:false}))}
+  await rpc('admin_log_event',{p_action:'Sauvegarde complète',p_detail:S.length+' boutiques'});
+  download('sauvegarde-complete-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(out));b.textContent='✔ Sauvegarde téléchargée ('+S.length+' boutiques). Garde-la en lieu sûr.'},
+ async resetpw(d){const{error}=await c.auth.resetPasswordForEmail(d.e,{redirectTo:location.origin+location.pathname.replace(/admin\.html$/,'')});if(error)throw error;toast('Lien envoyé à '+d.e)},
+ async rmember(d){if(!confirm('Retirer '+d.e+' de « '+cur.name+' » ?'))return;await rpc('admin_remove_member',{p_shop:cur.shop_id,p_email:d.e});toast('Membre retiré');await refreshFiche()},
+ async exportshop(){const j=await rpc('admin_export_shop',{p_shop:cur.shop_id});download('boutique-'+cur.name.replace(/[^\w-]+/g,'_')+'-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(j,null,1));toast('Export téléchargé')},
+ async delshop(){const n=prompt('Supprimer DÉFINITIVEMENT « '+cur.name+' » et toutes ses données ?\nTapez le nom exact de la boutique pour confirmer :');if(n===null)return;if(n.trim()!==cur.name){toast('Nom différent : suppression annulée');return}
+  const u=confirm('Supprimer aussi les comptes utilisateurs de cette boutique (propriétaire et membres) ?\nOK = oui · Annuler = garder les comptes');
+  await rpc('admin_delete_shop',{p_shop:cur.shop_id,p_delete_users:u});toast('Boutique supprimée');$('fiche').classList.remove('on');$('fiche').innerHTML='';await load()},
+ async newfactor(){sub='sec';show('mfa');await enrollUI()},
+ async mverify(d){const{error}=await c.auth.mfa.challengeAndVerify({factorId:d.f,code:$('mcode').value.trim()});if(error){$('mmsg').textContent='Code incorrect, réessaie.';return}await load()},
+ mcancel(){ME.aal==='aal2'||!ME.mfa_required?show('app'):A.logout()},
+ async mfareq(d){await rpc('admin_set_settings',{p_settings:{admin_mfa_required:d.v==='1'}});ME=await rpc('admin_me');toast(d.v==='1'?'Code exigé ✔':'Code non exigé');vMore()}
+});
+
 init();
 </script></body></html>

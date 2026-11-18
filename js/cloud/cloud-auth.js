@@ -258,7 +258,8 @@ const CloudAuth = {
     this._entered = true;
     this._hide();
     this._badge();
-    if (this.ctx && this.ctx.shopId) this._initClient().then(ok => { if (ok) Sync.start(); });
+    if (typeof Platform !== 'undefined') Platform.showAnnouncement();
+    if (this.ctx && this.ctx.shopId) this._initClient().then(ok => { if (ok) { Sync.start(); if (typeof Platform !== 'undefined') Platform.refresh(this.client); } });
     if (this.isSeller()) { this._sellerHook(); this._sellerLogin(); return; }   // vendeur cloud : pas de PIN
     if ((typeof CloudTeam !== 'undefined')) CloudTeam.init();
     if (typeof Billing !== 'undefined') Billing.init();
@@ -357,7 +358,7 @@ const CloudAuth = {
       '<div id="cloud-step-shop" style="display:none">' +
         '<div class="cloud-tabs"><button id="cloud-tab-new" class="on" onclick="CloudAuth.shopTab(\'new\')">Créer ma boutique</button>' +
         '<button id="cloud-tab-code" onclick="CloudAuth.shopTab(\'code\')">J\'ai un code</button></div>' +
-        '<div id="cloud-pane-new"><div class="cloud-hint">Nommez votre boutique. 14 jours d\'essai gratuit.</div>' +
+        '<div id="cloud-pane-new"><div class="cloud-hint">Nommez votre boutique. ' + (typeof Platform !== 'undefined' ? Platform.trialDays : 14) + ' jours d\'essai gratuit.</div>' +
         '<input id="cloud-shop" type="text" placeholder="Nom de la boutique" maxlength="60">' +
         '<div class="cloud-wa">💬 <b>Ajoutez votre WhatsApp</b> : nous vous aidons en quelques minutes en cas de souci et nous vous prévenons avant la fin de votre abonnement, pour que vous ne perdiez jamais votre synchronisation. Pas de spam, jamais partagé.</div>' +
         '<input id="cloud-wa" type="tel" inputmode="tel" placeholder="Votre numéro WhatsApp (facultatif)" maxlength="20">' +

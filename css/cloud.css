@@ -38,3 +38,7 @@
 .cloud-legal{text-align:center;margin-top:14px;font-family:var(--fm);font-size:.64rem;color:var(--text3)}
 .cloud-wa{font-family:var(--fm);font-size:.72rem;line-height:1.55;color:var(--text2);background:rgba(46,230,166,.07);border:1px solid var(--border);border-radius:var(--rmd);padding:10px 12px;margin:0 0 8px}
 .cloud-wa b{color:var(--accent)}
+.cloud-banner{position:fixed;left:12px;right:12px;bottom:78px;z-index:9500;display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--accent);border-radius:var(--rmd);padding:11px 14px;font-family:var(--fm);font-size:.78rem;line-height:1.5;color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.cloud-banner.warn{border-color:var(--warning,#f5b941)}
+.cloud-banner span{flex:1}.cloud-banner button{background:none;border:0;color:var(--text2);font-size:1rem;cursor:pointer;padding:0 2px}
+@media(min-width:900px){.cloud-banner{bottom:16px;left:auto;max-width:420px}}

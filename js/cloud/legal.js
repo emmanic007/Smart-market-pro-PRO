@@ -9,6 +9,8 @@
     const v = L[el.dataset.l];
     if (v) el.textContent = v; else { el.textContent = '[à compléter]'; el.classList.add('todo'); }
   });
+  const td = document.getElementById('trial-days');
+  if (td && typeof Platform !== 'undefined') td.textContent = Platform.trialDays;
   const ul = document.getElementById('prices');
   if (ul && typeof BILLING !== 'undefined') ul.innerHTML = BILLING.options.map(o => '<li><b>' + o.label + '</b> : ' + fmt(o.price) + '\u00a0' + BILLING.currency + '</li>').join('');
   const pm = document.getElementById('pay-methods');
