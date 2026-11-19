@@ -30,12 +30,12 @@ const BILLING = {
    Un champ laissé vide apparaît en jaune « [à compléter] » dans les pages : remplis-les avant le lancement. */
 const LEGAL = {
   publisher: 'EZE Jean Emmanuel',
-  status: '',          // ex : « entrepreneur individuel » ou nom de l'entreprise, avec IFU / RCCM si tu en as
-  address: '',         // ville et pays, ex : « Cotonou, Bénin »
+  status: 'éditeur indépendant (personne physique)',          // ex : « entrepreneur individuel » ou nom de l'entreprise, avec IFU / RCCM si tu en as
+  address: 'Bénin',         // ville et pays, ex : « Cotonou, Bénin »
   email: '',           // email de contact pour les clients
   whatsapp: '+229 01 61 15 61 06',
   region: '',          // lieu des serveurs Supabase, ex : « Europe (Francfort) » — visible dans Supabase > Project Settings
-  courts: '',          // tribunaux compétents, ex : « tribunaux de Cotonou »
+  courts: 'juridictions béninoises compétentes',          // tribunaux compétents, ex : « tribunaux de Cotonou »
   apdp: '',            // n° de déclaration auprès de l'APDP (laisser vide tant que non obtenu : la ligne est alors masquée)
   retentionDays: 90,   // jours de conservation des données en ligne après la fin d'un abonnement
   updated: '17 novembre 2026',

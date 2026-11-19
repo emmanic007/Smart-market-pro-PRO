@@ -340,7 +340,7 @@ const CloudAuth = {
         '<label id="cloud-agree-box" class="cloud-agree" style="display:none"><input type="checkbox" id="cloud-agree"><span>J\'accepte les <a href="conditions.html" target="_blank" rel="noopener">Conditions d\'utilisation</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">Politique de confidentialité</a>.</span></label>' +
         '<button id="cloud-submit" class="btn btn-primary" onclick="CloudAuth.submit()">Se connecter</button>' +
         '<button class="cloud-link" onclick="CloudAuth.showForgot()">Mot de passe oublié ?</button>' +
-        '<div class="cloud-legal"><a href="conditions.html" target="_blank" rel="noopener">Conditions d\'utilisation</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a></div>' +
+        '<div class="cloud-legal"><a href="conditions.html" target="_blank" rel="noopener">Conditions d\'utilisation</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a><br><a href="migration.html" target="_blank" rel="noopener">Vous venez de la version FREE ? Guide de migration</a></div>' +
         '<button id="cloud-skip" class="cloud-link" onclick="CloudAuth.skip()" style="display:none">Continuer sans compte (hors ligne)</button>' +
       '</div>' +
       '<div id="cloud-step-forgot" style="display:none">' +

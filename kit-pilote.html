@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Kit de pilote — Smart Market Pro</title><style>:root{color-scheme:light dark;--bg:#fff;--tx:#1b1f27;--mut:#5b6472;--ac:#0a8f63;--bd:#dfe3ea}@media(prefers-color-scheme:dark){:root{--bg:#0b0e14;--tx:#e8ecf4;--mut:#9aa4b5;--ac:#2ee6a6;--bd:#242b3a}}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}main{max-width:760px;margin:auto;padding:20px 18px 60px}
+h1{font-size:1.5rem;margin:.3em 0}h2{font-size:1.1rem;margin:1.8em 0 .4em;color:var(--ac)}p,li{margin:.5em 0}.mut{color:var(--mut);font-size:.9rem}a{color:var(--ac)}
+.todo{background:#ffe08a;color:#000;padding:0 5px;border-radius:4px;font-weight:600}table{border-collapse:collapse;width:100%;font-size:.93rem}td,th{border:1px solid var(--bd);padding:8px;text-align:left;vertical-align:top}th{width:32%}.back{display:inline-block;margin-bottom:6px}</style>
+<style>pre.m{white-space:pre-wrap;background:rgba(127,127,127,.12);border:1px solid var(--bd);border-radius:10px;padding:12px;font:inherit;font-size:.93rem;margin:.4em 0}button.cp{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:8px}label.ck{display:flex;gap:10px;align-items:flex-start;margin:.5em 0}label.ck input{margin-top:.35em;width:18px;height:18px;flex:none}</style></head><body><main>
+<a class="back" href="./">← Application</a>
+<h1>Kit de pilote</h1>
+<p class="mut">Document interne. Objectif : tester l'application avec 3 à 5 commerçants pendant 1 à 2 semaines avant d'ouvrir à tous.</p>
+
+<h2>1. Qui choisir ?</h2>
+<ul>
+<li>3 à 5 commerçants de confiance, qui vendent vraiment chaque jour.</li>
+<li>Au moins <b>1 boutique avec un seul vendeur</b> (le patron) et <b>1 boutique avec 2 ou 3 vendeurs</b>.</li>
+<li>Si possible un endroit au <b>réseau faible</b>, et un client venant de la version FREE (pour tester la migration).</li>
+<li>Des gens qui vous disent franchement ce qui ne va pas.</li>
+</ul>
+
+<h2>2. Avant de commencer (vous)</h2>
+<label class="ck"><input type="checkbox">Télécharger une <b>sauvegarde complète</b> (admin.html › Plus › Sauvegarde).</label>
+<label class="ck"><input type="checkbox">Compléter les informations légales manquantes (région des serveurs dans <code>config.js</code>).</label>
+<label class="ck"><input type="checkbox">Vérifier les numéros de paiement et le WhatsApp (admin.html › Plus › Réglages).</label>
+<label class="ck"><input type="checkbox">Faire le tour complet vous-même sur votre téléphone : installation, mode avion, vente hors ligne, retour du réseau.</label>
+<label class="ck"><input type="checkbox">Préparer un moyen de noter les retours (section 6).</label>
+
+<h2>3. Offre pilote</h2>
+<p>Proposez à chaque pilote <b>30 jours offerts en plus de l'essai</b>, en échange de retours honnêtes. Pour les accorder : <i>admin.html › fiche de la boutique › 🎁 Offrir des jours</i> (le journal en garde la trace).</p>
+
+<h2>4. Messages prêts à envoyer</h2>
+<p><b>Invitation</b></p><pre class="m">Bonjour {NOM}, je prépare une nouvelle version de Smart Market Pro (gestion de boutique : ventes, stock, dettes, plusieurs vendeurs, même sans internet). Je cherche quelques commerçants pour l'essayer pendant 2 semaines, gratuitement, avec un mois offert ensuite. Votre avis m'aiderait beaucoup. Intéressé(e) ? Je vous guide pas à pas sur WhatsApp.</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+<p><b>Jour 0 — mise en route</b></p><pre class="m">Merci {NOM} ! Voici le lien : {URL}
+1) Touchez « Créer un compte » (email + mot de passe), puis nommez votre boutique.
+2) Ajoutez votre WhatsApp quand l'application le propose : je pourrai vous aider vite.
+3) Installez l'application sur l'écran d'accueil (menu du navigateur › Ajouter à l'écran d'accueil).
+Dites-moi dès que c'est fait, je reste disponible.</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+<p><b>Jour 2 — petite relance</b></p><pre class="m">Bonjour {NOM}, comment ça se passe avec Smart Market Pro ? Avez-vous pu faire quelques ventes ? Si quelque chose vous gêne ou vous semble compliqué, dites-le-moi, même un détail : c'est exactement ce que je cherche.</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+<p><b>Jour 7 — bilan</b></p><pre class="m">Bonjour {NOM}, cela fait une semaine. 3 questions rapides :
+1) Qu'est-ce qui vous plaît le plus ?
+2) Qu'est-ce qui vous a gêné ou bloqué ?
+3) Seriez-vous prêt(e) à payer {PRIX1} par mois pour continuer ?
+Merci énormément pour votre aide !</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+<p><b>Fin d'essai — passage à l'abonnement</b></p><pre class="m">Bonjour {NOM}, votre période gratuite se termine bientôt. Pour continuer sans interruption : {PRIX}. Paiement par mobile money (MTN, Moov, Celtiis) : dans l'application, Paramètres › Abonnement › Payer. Envoyez-moi la preuve ici et j'active votre boutique. Merci de votre confiance !</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+<p><b>Remerciement</b></p><pre class="m">Merci {NOM} pour votre aide pendant ce test, vos remarques ont déjà amélioré l'application. Si vous êtes satisfait(e), une phrase de témoignage m'aiderait beaucoup, et si vous connaissez un commerçant qui pourrait en profiter, je le guide avec plaisir.</pre><button class="cp" onclick="cp(this)">📋 Copier</button>
+
+<h2>5. Scénario de test à proposer au commerçant</h2>
+<p class="mut">À cocher ensemble au téléphone, un point par jour pendant la première semaine.</p>
+<label class="ck"><input type="checkbox">Créer le compte et la boutique, installer l'application sur l'écran d'accueil.</label>
+<label class="ck"><input type="checkbox">Reprendre ses données (restauration d'une sauvegarde FREE) ou ajouter 5 produits.</label>
+<label class="ck"><input type="checkbox">Faire une vente simple, puis une vente à crédit (dette d'un client).</label>
+<label class="ck"><input type="checkbox">Passer en <b>mode avion</b>, faire 2 ventes, fermer complètement l'application, la rouvrir : les ventes sont-elles là ?</label>
+<label class="ck"><input type="checkbox">Remettre le réseau : la pastille indique-t-elle « Synchronisé » ?</label>
+<label class="ck"><input type="checkbox">Réapprovisionner un produit, vérifier le stock.</label>
+<label class="ck"><input type="checkbox">Inviter un vendeur avec un code ; le vendeur crée son compte et fait des ventes depuis son téléphone.</label>
+<label class="ck"><input type="checkbox">Vérifier côté patron que les ventes du vendeur arrivent et que le stock se met à jour partout.</label>
+<label class="ck"><input type="checkbox">Faire une « Saisie différée » (ventes notées dans le cahier) en fin de journée.</label>
+<label class="ck"><input type="checkbox">Regarder le Résumé de fin de journée, les dettes et les analyses.</label>
+<label class="ck"><input type="checkbox">Tester « Mot de passe oublié ? » avec son email.</label>
+
+<h2>6. Suivre les retours</h2>
+<p>Pour chaque pilote, notez dans un tableur ou une note du téléphone :</p>
+<pre class="m">Nom · boutique · ville · date de début
+Nb de vendeurs · appareils utilisés (marque, Android/iPhone)
+Utilise chaque jour ? (oui / non) · dernière vente vue dans admin.html
+Problèmes rencontrés (date · ce qui s'est passé · capture d'écran)
+Ce qu'il aime · ce qu'il aimerait en plus
+Prêt à payer ? (oui / non / à quel prix)</pre>
+<p>Dans <b>admin.html</b>, la fiche de chaque boutique montre sa dernière activité, ses ventes sur 14 jours et ses membres : vous voyez si le pilote utilise vraiment l'application. Utilisez le champ <b>Notes internes</b> pour y consigner ses remarques.</p>
+<p>Pour chaque bug, demandez : <i>Que faisiez-vous ? Qu'avez-vous vu ? Sur quel téléphone ? Une capture d'écran ?</i> Puis envoyez-moi ces quatre réponses ici.</p>
+
+<h2>7. Quand ouvrir à tous ?</h2>
+<ul>
+<li>✅ Aucune donnée perdue chez aucun pilote.</li>
+<li>✅ Aucun bug bloquant resté ouvert (vente impossible, synchro bloquée, stock faux).</li>
+<li>✅ La migration FREE vers PRO réussie sans aide de votre part pour au moins un client.</li>
+<li>✅ Au moins 3 pilotes sur 5 utilisent encore l'application après 7 jours.</li>
+<li>✅ Au moins un vrai paiement mobile money reçu et activé sans accroc.</li>
+<li>✅ Informations légales complètes, et pages validées par un juriste.</li>
+</ul>
+<script>
+function cp(b){const t=b.previousElementSibling.textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='✔ Copié';setTimeout(()=>b.textContent='📋 Copier',1800)},()=>{const r=document.createRange();r.selectNodeContents(b.previousElementSibling);getSelection().removeAllRanges();getSelection().addRange(r);b.textContent='Sélectionné : copiez'})}
+const U=location.origin+location.pathname.replace(/[^/]*$/,''),fm=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
+window.addEventListener('load',()=>{const P=(typeof BILLING!=='undefined'?BILLING.options:[]);const p1=P[0]?fm(P[0].price)+' F':'2\u00a0500 F',all=P.map(o=>o.label+' : '+fm(o.price)+' F').join(' · ');
+ document.querySelectorAll('pre.m').forEach(e=>{e.textContent=e.textContent.replace(/\{URL\}/g,U).replace(/\{PRIX1\}/g,p1).replace(/\{PRIX\}/g,all||p1)})});
+</script>
+</main><script src="js/cloud/config.js"></script><script src="js/cloud/platform.js"></script><script src="js/cloud/legal.js"></script></body></html>

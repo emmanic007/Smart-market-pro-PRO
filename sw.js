@@ -15,6 +15,7 @@ const APP_SHELL = [
   './js/cloud/platform.js',
   './js/cloud/legal.js',
   './conditions.html',
+  './migration.html',
   './confidentialite.html',
   './js/cloud/sync.js',
   './js/cloud/billing.js',
