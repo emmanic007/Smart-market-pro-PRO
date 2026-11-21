@@ -24,6 +24,7 @@ const APP_SHELL = [
   './js/core/utils.js',
   './js/core/i18n.js',
   './js/core/ui.js',
+  './js/modules/formats.js',
   './js/modules/sales.js',
   './js/modules/stock.js',
   './js/modules/analytics.js',
