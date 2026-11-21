@@ -477,11 +477,15 @@
       <div class="form-group"><label class="form-label" data-i18n="lbl_barcode">Code-barres</label><input type="text" id="edit-stock-code"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_buy_price">Prix Achat *</label><input type="number" id="edit-stock-buy" min="0" inputmode="decimal"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_sell_price">Prix Vente *</label><input type="number" id="edit-stock-sell" min="0" inputmode="decimal"></div>
-      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité *</label><input type="number" id="edit-stock-qty" min="0" inputmode="numeric"></div>
-      <div class="form-group"><label class="form-label" data-i18n="lbl_alert_threshold">Seuil Alerte</label><input type="number" id="edit-stock-min" min="0" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité *</label><input type="number" id="edit-stock-qty" min="0" step="any" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_alert_threshold">Seuil Alerte</label><input type="number" id="edit-stock-min" min="0" step="any" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Unité de base</label><input type="text" id="edit-stock-unit" maxlength="20" placeholder="unité"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_tva">TVA (%)</label><input type="number" id="edit-stock-tva" min="0" max="100" inputmode="decimal"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_category">Catégorie</label><select id="edit-stock-cat"></select></div>
       <div class="form-group" style="grid-column:1/-1"><label class="form-label" data-i18n="lbl_description">Description</label><input type="text" id="edit-stock-desc" placeholder="Détails..." data-i18n-placeholder="lbl_details"></div>
+      <div class="form-group" style="grid-column:1/-1"><label class="form-label">Formats de vente <small>(prix d'un format ; « unités » = combien d'unités de base il contient)</small></label>
+        <div id="edit-formats-list"></div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="Formats.editorAdd()">+ Ajouter un format</button></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn btn-ghost" style="flex:1" onclick="Stock.closeEdit()" data-i18n="btn_cancel">Annuler</button>
@@ -806,10 +810,13 @@
     <div class="form-grid">
       <div class="form-group"><label class="form-label" data-i18n="lbl_product_name">Nom du Produit *</label><input type="text" id="i-name"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_barcode">Code-barres</label><input type="text" id="i-code"></div>
-      <div class="form-group"><label class="form-label" data-i18n="lbl_buy_price_f">Prix Achat (F) *</label><input type="number" id="i-buy" min="0" inputmode="decimal"></div>
-      <div class="form-group"><label class="form-label" data-i18n="lbl_sell_price_f">Prix Vente (F) *</label><input type="number" id="i-sell" min="0" inputmode="decimal"></div>
-      <div class="form-group"><label class="form-label" data-i18n="def_qty_star">Quantité *</label><input type="number" id="i-qty" min="1" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_buy_price_f">Prix Achat (F) *</label><input type="number" id="i-buy" min="0" step="any" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_sell_price_f">Prix Vente (F) *</label><input type="number" id="i-sell" min="0" step="any" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label" data-i18n="def_qty_star">Quantité *</label><input type="number" id="i-qty" min="0" step="any" inputmode="decimal"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_alert_threshold">Seuil Alerte</label><input type="number" id="i-min" placeholder="5" min="1" inputmode="numeric"></div>
+      <div class="form-group"><label class="form-label">Unité de base <small>(kg, bouteille…)</small></label><input type="text" id="i-unit" maxlength="20" placeholder="unité"></div>
+      <div class="form-group"><label class="form-label">Acheté par <small>(ex. Casier)</small></label><input type="text" id="i-pack-name" maxlength="30" placeholder="facultatif"></div>
+      <div class="form-group"><label class="form-label">Unités par conditionnement</label><input type="number" id="i-pack-n" min="0" step="any" inputmode="decimal" placeholder="ex. 12"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_category">Catégorie</label><select id="i-category"><option value="Autre">Autre</option></select></div>
       <div class="form-group" style="grid-column:1/-1"><label class="form-label" data-i18n="lbl_desc_optional">Description (optionnel)</label><input type="text" id="i-desc" placeholder="Référence, détails fournisseur..." data-i18n-placeholder="ph_ref_details"></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_supplier">Fournisseur</label><select id="i-supplier"><option value="" data-i18n="lbl_none_m">— Aucun —</option></select></div>

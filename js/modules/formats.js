@@ -57,5 +57,38 @@ const Formats = {
       (f.n !== 1 ? ' (' + this.qtyText(f.n) + ')' : '') + ' — ' + Utils.currency(f.price) + '</option>'
     ).join('');
     sel.value = selectedId || '';
+  },
+  /* ── Éditeur de formats (fenêtre de modification d'un produit) ── */
+  _row(f) {
+    const e = Utils.esc;
+    return '<div class="fmt-row" style="display:grid;grid-template-columns:1.4fr .8fr 1fr auto;gap:6px;margin-bottom:6px">' +
+      '<input type="text" class="fmt-name" placeholder="Nom (ex. Casier)" maxlength="30" value="' + e(f.name || '') + '" data-id="' + e(f.id || '') + '">' +
+      '<input type="number" class="fmt-n" placeholder="Unités" min="0" step="any" inputmode="decimal" value="' + e(f.n ?? '') + '">' +
+      '<input type="number" class="fmt-price" placeholder="Prix" min="0" step="any" inputmode="decimal" value="' + e(f.price ?? '') + '">' +
+      '<button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.remove()">✕</button></div>';
+  },
+  editorFill(item) {
+    const box = document.getElementById('edit-formats-list'); if (!box) return;
+    box.innerHTML = (item.formats || []).map(f => this._row(f)).join('');
+  },
+  editorAdd() {
+    const box = document.getElementById('edit-formats-list'); if (!box) return;
+    box.insertAdjacentHTML('beforeend', this._row({ id: '' }));
+  },
+  // Lit l'éditeur ; renvoie {formats} ou {error}
+  editorRead() {
+    const rows = document.querySelectorAll('#edit-formats-list .fmt-row');
+    const out = [], seen = new Set();
+    for (const r of rows) {
+      const name = r.querySelector('.fmt-name').value.trim();
+      const n = Utils.num(r.querySelector('.fmt-n').value);
+      const price = Utils.num(r.querySelector('.fmt-price').value);
+      if (!name && isNaN(n) && isNaN(price)) continue;
+      if (!name || !(n > 0) || isNaN(price) || price < 0) return { error: 'Format incomplet : nom, unités (> 0) et prix sont obligatoires.' };
+      if (seen.has(name.toLowerCase())) return { error: 'Deux formats ont le même nom : ' + name };
+      seen.add(name.toLowerCase());
+      out.push({ id: r.querySelector('.fmt-name').dataset.id || ('f' + Math.random().toString(36).slice(2, 7)), name, n: this.r(n), price });
+    }
+    return { formats: out };
   }
 };
