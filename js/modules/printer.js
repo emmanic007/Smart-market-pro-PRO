@@ -13,7 +13,7 @@ const Printer = {
       <div class="t-center">Vendeur: ${Utils.esc(sale.userName)}</div>
       <div class="t-line"></div>
       <div class="t-row"><span>${Utils.esc(sale.itemName)}</span></div>
-      <div class="t-row"><span>${sale.qty} × ${Utils.currency(sale.price)}</span><span class="t-bold">${Utils.currency(sale.total)}</span></div>
+      <div class="t-row"><span>${Formats.recQty(sale)} × ${Utils.currency(Formats.recPrice(sale))}</span><span class="t-bold">${Utils.currency(sale.total)}</span></div>
       ${sale.debt>0?`<div class="t-row"><span style="color:red">Dette</span><span style="color:red">${Utils.currency(sale.debt)}</span></div>`:''}
       <div class="t-line"></div>
       <div class="t-row t-bold"><span>TOTAL</span><span>${Utils.currency(sale.total)}</span></div>

@@ -14,7 +14,7 @@ const Returns = {
 
     // Restaurer le stock
     const item = DB.data.items.find(i => i.id === sale.itemId);
-    if (item) item.qty += sale.qty;
+    if (item) item.qty = Formats.r(item.qty + sale.qty);
 
     // Déduire les points fidélité si applicable
     if (sale.clientName && typeof Loyalty !== 'undefined') {
@@ -76,7 +76,7 @@ const Returns = {
       <tr>
         <td class="td-mono" style="font-size:.72rem">${new Date(r.date).toLocaleDateString('fr-FR')}</td>
         <td class="fw-700">${Utils.esc(r.itemName)}</td>
-        <td class="td-mono">${r.qty}</td>
+        <td class="td-mono">${Formats.qtyText(r.qty)}</td>
         <td class="td-mono" style="color:var(--danger)">${Utils.currency(r.amount)}</td>
         <td>${r.debtCancelled > 0 ? '<span style="color:var(--warning);font-size:.7rem">−' + Utils.currency(r.debtCancelled) + ' dette</span>' : '—'}</td>
         <td>${Utils.esc(r.clientName || '—')}</td>

@@ -38,6 +38,9 @@ const Formats = {
     const v = this.r(q);
     return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(v);
   },
+  // Reçus : « 2 Casier » × prix d'un format
+  recQty(sale) { return (sale && sale.fmt && sale.fmt.name) ? this.qtyText(sale.fmt.count) + ' ' + sale.fmt.name : this.qtyText(sale ? sale.qty : 0); },
+  recPrice(sale) { return (sale && sale.fmt && sale.fmt.count > 0) ? Math.round(sale.total / sale.fmt.count * 100) / 100 : sale.price; },
   stockShort(item) { return this.qtyText(item ? item.qty : 0) + (item && item.unit ? ' ' + item.unit : ''); },
   // Ex. « 37 bouteille ≈ 3 Casier + 1 » (plus grand format entier d'abord)
   stockLabel(item) {

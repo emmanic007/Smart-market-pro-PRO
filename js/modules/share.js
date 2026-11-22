@@ -14,7 +14,7 @@ const Share = {
       `📅 ${date}\n` +
       `👤 Vendeur: ${sale.userName}\n\n` +
       `*${sale.itemName}*\n` +
-      `${sale.qty} × ${sale.price} ${curr} = *${sale.total} ${curr}*\n` +
+      `${Formats.recQty(sale)} × ${Formats.recPrice(sale)} ${curr} = *${sale.total} ${curr}*\n` +
       (sale.debt > 0 ? `⚠️ Reste à payer: ${sale.debt} ${curr}\n` : `✅ Soldé\n`) +
       (sale.clientName ? `👤 Client: ${sale.clientName}\n` : '') +
       `\n_Merci de votre confiance !_\n_Smart Market Pro v7.5_`;
