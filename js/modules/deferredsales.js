@@ -70,7 +70,7 @@ const DeferredSales = {
   addLine() {
     const id = ++this._lineId;
     // Nouvelle ligne vide TOUJOURS en haut (unshift, pas push)
-    this._lines.unshift({ id, itemId:'', qty:1, price:0, paid:'', client:'' });
+    this._lines.unshift({ id, itemId:'', fmtId:'', qty:1, price:0, paid:'', client:'' });
     this._renderLines();
     // Focus direct sur le select, sans besoin de scroll — elle est déjà en haut
     setTimeout(() => {
@@ -97,9 +97,19 @@ const DeferredSales = {
     line[field] = value;
     if (field === 'itemId') {
       const item = DB.data.items.find(i => i.id === value);
+      line.fmtId = '';
       if (item) line.price = item.sell;
       const priceEl = document.getElementById('def-price-' + id);
       if (priceEl && item) priceEl.value = item.sell;
+      const w = document.getElementById('def-fmtwrap-' + id), s = document.getElementById('def-fmt-' + id);
+      if (w) { w.style.display = (item && Formats.has(item)) ? '' : 'none'; if (item) Formats.fillSelect(s, item, ''); }
+    } else if (field === 'fmtId') {
+      const item = DB.data.items.find(i => i.id === line.itemId);
+      if (item) {
+        line.price = Formats.get(item, value).price;
+        const priceEl = document.getElementById('def-price-' + id);
+        if (priceEl) priceEl.value = line.price;
+      }
     }
     this._updateLineTotal(id);
     this._updateSummary();
@@ -110,7 +120,7 @@ const DeferredSales = {
     if (!line) return;
     const item = DB.data.items.find(i => i.id === line.itemId);
     if (!item) { UI.toast(I18n.t('toast_err_item_required'), 'danger'); return; }
-    if (!(parseInt(line.qty) > 0)) { UI.toast(I18n.t('toast_err_qty_required'), 'danger'); return; }
+    if (!(parseFloat(line.qty) > 0)) { UI.toast(I18n.t('toast_err_qty_required'), 'danger'); return; }
     line._wasFilled = true;
     this._lines = this._lines.filter(l => l.id !== id);
     const firstValidatedIdx = this._lines.findIndex(l => l._wasFilled);
@@ -124,7 +134,7 @@ const DeferredSales = {
   _updateLineTotal(id) {
     const line    = this._lines.find(l => l.id === id);
     if (!line) return;
-    const qty     = parseInt(line.qty)   || 0;
+    const qty     = parseFloat(line.qty)   || 0;
     const price   = parseFloat(line.price) || 0;
     const total   = qty * price;
     const totEl   = document.getElementById('def-total-' + id);
@@ -148,9 +158,9 @@ const DeferredSales = {
 
   _updateSummary() {
     const total = this._lines.reduce((t, l) => {
-      return t + (parseInt(l.qty)||0) * (parseFloat(l.price)||0);
+      return t + (parseFloat(l.qty)||0) * (parseFloat(l.price)||0);
     }, 0);
-    const valid = this._lines.filter(l => l.itemId && parseInt(l.qty) > 0 && parseFloat(l.price) >= 0).length;
+    const valid = this._lines.filter(l => l.itemId && parseFloat(l.qty) > 0 && parseFloat(l.price) >= 0).length;
     const se = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
     se('def-total-display', Utils.currency(total));
     se('def-lines-info', valid + ' ' + I18n.t('def_lines_valid'));
@@ -172,7 +182,7 @@ const DeferredSales = {
     const sortLocale = I18n._lang === 'en' ? 'en' : 'fr';
     const sortedItems = [...items].sort((a,b) => a.name.localeCompare(b.name,sortLocale,{sensitivity:'base'}));
     const itemOpts = sortedItems.length
-      ? `<option value="">${I18n.t('def_choose_short')}</option>` + sortedItems.map(i => `<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${i.qty})</option>`).join('')
+      ? `<option value="">${I18n.t('def_choose_short')}</option>` + sortedItems.map(i => `<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${Formats.stockShort(i)})</option>`).join('')
       : `<option value="">— ${I18n.t('no_stock')} —</option>`;
 
     container.innerHTML = this._lines.map((line, idx) => `
@@ -186,10 +196,12 @@ const DeferredSales = {
             ${itemOpts}
           </select>
         </div>
+        ${(() => { const it = DB.data.items.find(x => x.id === line.itemId); const has = it && Formats.has(it);
+          return `<div class="form-group" id="def-fmtwrap-${line.id}" style="grid-column:1/-1;margin-bottom:0;${has ? '' : 'display:none'}"><label class="form-label">Format de vente</label><select id="def-fmt-${line.id}" onchange="DeferredSales.updateLine(${line.id},'fmtId',this.value)">${has ? Formats.list(it).map(f => `<option value="${Utils.esc(f.id)}" ${f.id === (line.fmtId||'') ? 'selected' : ''}>${Utils.esc(f.name)}${f.n !== 1 ? ' (' + Formats.qtyText(f.n) + ')' : ''} — ${Utils.currency(f.price)}</option>`).join('') : ''}</select></div>`; })()}
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">${I18n.t('def_qty_star')}</label>
           <input type="number" id="def-qty-${line.id}" value="${line.qty}"
-            min="1" inputmode="numeric"
+            min="0" step="any" inputmode="decimal"
             oninput="DeferredSales.updateLine(${line.id},'qty',this.value)">
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -250,7 +262,7 @@ const DeferredSales = {
     // Filtrer les lignes valides
     const valid = this._lines.filter(l => {
       const item = DB.data.items.find(i => i.id === l.itemId);
-      return item && parseInt(l.qty) > 0 && parseFloat(l.price) >= 0;
+      return item && parseFloat(l.qty) > 0 && parseFloat(l.price) >= 0;
     });
 
     if (!valid.length) return UI.toast(I18n.t('toast_err_no_lines'),'danger');
@@ -258,8 +270,8 @@ const DeferredSales = {
     // Vérifier le stock pour chaque ligne
     for (const line of valid) {
       const item = DB.data.items.find(i => i.id === line.itemId);
-      const qty  = parseInt(line.qty);
-      if (item.qty < qty) {
+      const qty  = Formats.r(parseFloat(line.qty) * Formats.get(item, line.fmtId).n);
+      if (item.qty + 1e-9 < qty) {
         UI.toast(`${I18n.t('toast_err_stock_low')} — ${item.name} (${item.qty} dispo)`, 'danger');
         return;
       }
@@ -276,9 +288,11 @@ const DeferredSales = {
     for (let i = 0; i < valid.length; i++) {
       const line  = valid[i];
       const item  = DB.data.items.find(x => x.id === line.itemId);
-      const qty   = parseInt(line.qty);
+      const fm    = Formats.get(item, line.fmtId);
+      const count = parseFloat(line.qty);
+      const qty   = Formats.r(count * fm.n);
       const price = parseFloat(line.price);
-      const total = qty * price;
+      const total = Math.round(count * price * 100) / 100;
       const paidRaw = line.paid === '' || line.paid == null ? null : parseFloat(line.paid);
       const paid  = (paidRaw == null || isNaN(paidRaw)) ? total : paidRaw;
       const debt  = Math.max(0, total - paid);
@@ -292,8 +306,9 @@ const DeferredSales = {
         date:       saleDate.toISOString(),
         itemId:     item.id,
         itemName:   item.name,
-        qty, price, total, debt,
-        profit:     (price - item.buy) * qty,
+        qty, price: Formats.r(price / fm.n), total, debt,
+        profit:     Math.round((total - item.buy * qty) * 100) / 100,
+        ...(fm.id ? { fmt: { id: fm.id, name: fm.name, n: fm.n, count: Formats.r(count) } } : {}),
         userId:     sellerId,
         userName:   sellerName,
         clientName: client,
@@ -301,7 +316,7 @@ const DeferredSales = {
         deferred:   true  // Marqueur pour identifier les saisies différées
       });
 
-      item.qty -= qty;
+      item.qty = Formats.r(item.qty - qty);
       if (client && typeof Loyalty !== 'undefined') Loyalty.addPoints(client, total);
       lineCount++;
       totalCA += total;

@@ -72,7 +72,7 @@ const SellerDash = {
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--sur2);border-radius:var(--rmd)">
             <div>
               <div style="font-weight:700;font-size:.85rem">${Utils.esc(s.itemName)}</div>
-              <div style="font-family:var(--fm);font-size:.65rem;color:var(--text3)">${new Date(s.date).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})} — ${s.qty} ${I18n.t('sd_units')}</div>
+              <div style="font-family:var(--fm);font-size:.65rem;color:var(--text3)">${new Date(s.date).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})} — ${s.fmt ? Formats.saleQty(s) : Formats.qtyText(s.qty) + ' ' + I18n.t('sd_units')}</div>
             </div>
             <div style="font-family:var(--fd);font-size:.95rem;font-weight:800;color:var(--accent)">${Utils.currency(s.total)}</div>
           </div>`).join('');

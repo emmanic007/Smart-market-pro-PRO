@@ -755,7 +755,8 @@
         <input type="text" id="s-item-search" placeholder="🔍 Rechercher un article..." data-i18n-placeholder="ph_search_item" autocomplete="off" style="margin-bottom:6px;font-size:.82rem" oninput="UI._filterItemSelect(this.value)">
         <select id="s-item" onchange="Sales.syncFields()"></select>
       </div>
-      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité</label><input type="number" id="s-qty" value="1" min="1" inputmode="numeric" oninput="Sales.validate()"></div>
+      <div class="form-group" id="s-format-wrap" style="display:none"><label class="form-label">Format de vente</label><select id="s-format" onchange="Sales.syncFields()"></select></div>
+      <div class="form-group"><label class="form-label" data-i18n="lbl_qty">Quantité</label><input type="number" id="s-qty" value="1" min="0" step="any" inputmode="decimal" oninput="Sales.validate()"><small id="s-format-hint" style="display:none;color:var(--text3);font-family:var(--fm);font-size:.65rem"></small></div>
       <div class="form-group"><label class="form-label" data-i18n="lbl_sell">Prix Unitaire <button type="button" onclick="Sales.toggleDiscount()" style="background:none;border:none;color:var(--warning);font-size:.65rem;cursor:pointer;font-family:var(--fm);text-decoration:underline;padding:0;margin-left:6px" id="s-discount-toggle">± Modifier le prix</button></label><input type="number" id="s-price" inputmode="decimal" oninput="Sales.validate()"></div>
       <div class="form-group" id="s-discount-wrap" style="display:none">
         <label class="form-label" style="color:var(--warning)"><span data-i18n="lbl_real_sell_price">Prix réel de vente</span> <span style="font-size:.6rem" data-i18n="lbl_modified">(modifié)</span></label>

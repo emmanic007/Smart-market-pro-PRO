@@ -130,7 +130,7 @@ const History = {
           <td><input type="checkbox" class="row-check hist-row-check" value="${Utils.esc(s.id)}" ${this._selected.has(s.id)?'checked':''} onchange="History.toggleOne('${Utils.esc(s.id)}', this.checked, this)" ${!Auth.isAdmin()?'disabled':''}></td>
           <td class="td-mono" style="font-size:.72rem">${new Date(s.date).toLocaleDateString(locale, {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}${s.deferred?'<span style="margin-left:3px;font-size:.55rem;color:var(--warning)">📒</span>':''}</td>
           <td class="fw-700">${Utils.esc(s.itemName || '')}</td>
-          <td class="td-mono">${s.qty}</td>
+          <td class="td-mono">${Formats.saleQty(s)}</td>
           <td class="td-mono">${Utils.currency(s.total)}</td>
           <td class="td-mono" style="color:var(--accent);font-weight:800">${Utils.currency(s.profit)}</td>
           <td>${Utils.esc(s.clientName || '—')}</td>

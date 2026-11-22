@@ -38,6 +38,7 @@ const Formats = {
     const v = this.r(q);
     return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(v);
   },
+  stockShort(item) { return this.qtyText(item ? item.qty : 0) + (item && item.unit ? ' ' + item.unit : ''); },
   // Ex. « 37 bouteille ≈ 3 Casier + 1 » (plus grand format entier d'abord)
   stockLabel(item) {
     const q = this.r(item ? item.qty : 0);

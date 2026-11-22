@@ -69,63 +69,85 @@ const SellerMode = {
     }
     grid.innerHTML = items.map(i => {
       const outOfStock = i.qty <= 0;
-      const inCart     = this._cart.find(c => c.itemId === i.id);
-      const cartQty    = inCart ? inCart.qty : 0;
+      const cartQty    = this._cart.filter(c => c.itemId === i.id).reduce((s, c) => s + c.qty * (c.n || 1), 0);
       return `
         <div class="sm-prod-card${outOfStock ? ' out-of-stock' : ''}"
           onclick="SellerMode.addToCart('${Utils.esc(i.id)}')">
           <div class="sm-prod-icon">📦</div>
           <div class="sm-prod-name">${Utils.esc(i.name)}</div>
-          <div class="sm-prod-price">${Utils.currency(i.sell)}</div>
+          <div class="sm-prod-price">${Utils.currency(i.sell)}${i.unit ? '<small style="font-size:.6em;opacity:.7"> /' + Utils.esc(i.unit) + '</small>' : ''}${Formats.has(i) ? ' ▾' : ''}</div>
           <div class="sm-prod-stock" style="color:${i.qty<=3?'var(--danger)':'var(--text3)'}">
-            ${outOfStock ? '❌ '+I18n.t('lbl_out_of_stock') : I18n.t('lbl_stock_short')+' : ' + i.qty + (cartQty ? ' ('+cartQty+' '+I18n.t('sm_in_cart')+')' : '')}
+            ${outOfStock ? '❌ '+I18n.t('lbl_out_of_stock') : I18n.t('lbl_stock_short')+' : ' + Formats.stockShort(i) + (cartQty ? ' ('+Formats.qtyText(cartQty)+' '+I18n.t('sm_in_cart')+')' : '')}
           </div>
         </div>`;
     }).join('');
   },
 
-  addToCart(itemId) {
+  _used(itemId, exceptKey) {
+    return this._cart.filter(c => c.itemId === itemId && c.key !== exceptKey).reduce((s, c) => s + c.qty * (c.n || 1), 0);
+  },
+
+  pickFormat(itemId) {
+    const item = DB.data.items.find(i => i.id === itemId); if (!item) return;
+    document.getElementById('sm-fmt-picker')?.remove();
+    const left = Formats.r(item.qty - this._used(itemId, null));
+    const d = document.createElement('div');
+    d.id = 'sm-fmt-picker';
+    d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+    d.onclick = e => { if (e.target === d) d.remove(); };
+    d.innerHTML = '<div style="background:var(--bg2,#0b1117);border:1px solid var(--border,#2a3441);border-radius:16px;padding:18px;width:100%;max-width:360px">' +
+      '<div style="font-weight:700;margin-bottom:4px">' + Utils.esc(item.name) + '</div>' +
+      '<div style="font-size:.72rem;opacity:.7;margin-bottom:12px">Stock : ' + Formats.stockShort(item) + '</div>' +
+      Formats.list(item).map(f => '<button type="button" class="btn btn-primary" ' + (f.n > left + 1e-9 ? 'disabled style="opacity:.4;' : 'style="') +
+        'width:100%;margin-bottom:8px;display:flex;justify-content:space-between" onclick="SellerMode.pickDone(\'' + Utils.esc(itemId) + '\',\'' + Utils.esc(f.id) + '\')"><span>' +
+        Utils.esc(f.name) + (f.n !== 1 ? ' (' + Formats.qtyText(f.n) + ')' : '') + '</span><span>' + Utils.currency(f.price) + '</span></button>').join('') +
+      '<button type="button" class="btn btn-secondary" style="width:100%" onclick="document.getElementById(\'sm-fmt-picker\').remove()">Annuler</button></div>';
+    document.body.appendChild(d);
+  },
+  pickDone(itemId, fmtId) {
+    document.getElementById('sm-fmt-picker')?.remove();
+    this.addToCart(itemId, fmtId);
+  },
+
+  addToCart(itemId, fmtId) {
     const item = DB.data.items.find(i => i.id === itemId);
     if (!item || item.qty <= 0) return UI.toast(I18n.t('toast_err_stock_low'),'danger');
-    const ex = this._cart.find(c => c.itemId === itemId);
-    if (ex) {
-      if (ex.qty >= item.qty) return UI.toast(I18n.t('toast_err_stock_max'),'warning');
-      ex.qty++;
-    } else {
-      this._cart.push({ itemId, itemName: item.name, qty: 1, price: item.sell, buy: item.buy });
-    }
+    if (fmtId === undefined && Formats.has(item)) return this.pickFormat(itemId);
+    const f = Formats.get(item, fmtId || '');
+    const key = itemId + '|' + f.id;
+    if (this._used(itemId, null) + f.n > item.qty + 1e-9) return UI.toast(I18n.t('toast_err_stock_max'),'warning');
+    const ex = this._cart.find(c => c.key === key);
+    if (ex) ex.qty++;
+    else this._cart.push({ key, itemId, itemName: item.name, fmtId: f.id, fmtName: f.id ? f.name : '', n: f.n, qty: 1, price: f.price, buy: Formats.r(item.buy * f.n) });
     this.renderCart();
     this.renderProducts();
-    // Sur mobile : basculer vers panier après ajout + feedback visuel
-    const isMobile = window.innerWidth <= 680;
-    if (isMobile) {
-      // Badge sur onglet panier
+    // Sur mobile : badge sur onglet panier
+    if (window.innerWidth <= 680) {
       const badge = document.getElementById('sm-tab-cart-badge');
       if (badge) {
-        const total = this._cart.reduce((t,c) => t+c.qty, 0);
-        badge.textContent = total;
+        badge.textContent = this._cart.reduce((s, c) => s + c.qty, 0);
         badge.classList.add('show');
       }
     }
   },
 
-  changeQty(itemId, delta) {
-    const ex   = this._cart.find(c => c.itemId === itemId);
-    const item = DB.data.items.find(i => i.id === itemId);
+  changeQty(key, delta) {
+    const ex = this._cart.find(c => c.key === key);
     if (!ex) return;
+    const item = DB.data.items.find(i => i.id === ex.itemId);
     ex.qty += delta;
     if (ex.qty <= 0) {
-      this._cart = this._cart.filter(c => c.itemId !== itemId);
-    } else if (item && ex.qty > item.qty) {
-      ex.qty = item.qty;
+      this._cart = this._cart.filter(c => c.key !== key);
+    } else if (item && delta > 0 && this._used(ex.itemId, key) + ex.qty * ex.n > item.qty + 1e-9) {
+      ex.qty -= delta;
       UI.toast(I18n.t('toast_err_stock_max'),'warning');
     }
     this.renderCart();
     this.renderProducts();
   },
 
-  removeFromCart(itemId) {
-    this._cart = this._cart.filter(c => c.itemId !== itemId);
+  removeFromCart(key) {
+    this._cart = this._cart.filter(c => c.key !== key);
     this.renderCart();
     this.renderProducts();
   },
@@ -181,16 +203,16 @@ const SellerMode = {
     cartEl.innerHTML = this._cart.map(it => `
       <div class="sm-cart-item">
         <div class="sm-cart-item-info">
-          <div class="sm-cart-item-name">${Utils.esc(it.itemName)}</div>
+          <div class="sm-cart-item-name">${Utils.esc(it.itemName)}${it.fmtName ? ' <small style="opacity:.7">— ' + Utils.esc(it.fmtName) + '</small>' : ''}</div>
           <div class="sm-qty-ctrl">
-            <button class="sm-qty-btn" onclick="SellerMode.changeQty('${Utils.esc(it.itemId)}',-1)">−</button>
+            <button class="sm-qty-btn" onclick="SellerMode.changeQty('${Utils.esc(it.key)}',-1)">−</button>
             <span class="sm-qty-val">${it.qty}</span>
-            <button class="sm-qty-btn" onclick="SellerMode.changeQty('${Utils.esc(it.itemId)}',1)">+</button>
+            <button class="sm-qty-btn" onclick="SellerMode.changeQty('${Utils.esc(it.key)}',1)">+</button>
             <span class="sm-cart-item-sub" style="margin-left:4px">× ${Utils.currency(it.price)}</span>
           </div>
         </div>
         <div class="sm-cart-item-price">${Utils.currency(it.price*it.qty)}</div>
-        <button class="sm-cart-item-del" onclick="SellerMode.removeFromCart('${Utils.esc(it.itemId)}')">✕</button>
+        <button class="sm-cart-item-del" onclick="SellerMode.removeFromCart('${Utils.esc(it.key)}')">✕</button>
       </div>`).join('');
 
     this.onPaidInput();
@@ -206,19 +228,20 @@ const SellerMode = {
 
     for (const it of this._cart) {
       const dbIt = DB.data.items.find(i => i.id === it.itemId);
-      if (!dbIt || dbIt.qty < it.qty) { UI.toast(`${I18n.t('toast_err_stock_low')} : ${it.itemName}`, 'danger'); return; }
+      if (!dbIt || dbIt.qty + 1e-9 < it.qty * (it.n || 1)) { UI.toast(`${I18n.t('toast_err_stock_low')} : ${it.itemName}`, 'danger'); return; }
       const itTotal = it.price * it.qty;
       const itPaid  = isNaN(paid) ? itTotal : Math.min(itTotal, paid);
       DB.data.sales.push({
         id: Utils.uid(), date: new Date().toISOString(),
-        itemId: it.itemId, itemName: it.itemName, qty: it.qty,
-        price: it.price, total: itTotal,
+        itemId: it.itemId, itemName: it.itemName, qty: Formats.r(it.qty * (it.n || 1)),
+        price: Formats.r(it.price / (it.n || 1)), total: itTotal,
+        ...(it.fmtId ? { fmt: { id: it.fmtId, name: it.fmtName, n: it.n, count: it.qty } } : {}),
         debt: Math.max(0, itTotal - (isNaN(paid) ? itTotal : paid)),
         profit: (it.price - it.buy) * it.qty,
         userId: Auth.currentUser?.id || '', userName: Auth.currentUser?.name || '',
         clientName: client, deleted: false
       });
-      dbIt.qty -= it.qty;
+      dbIt.qty = Formats.r(dbIt.qty - it.qty * (it.n || 1));
       if (client && typeof Loyalty !== 'undefined') Loyalty.addPoints(client, itTotal);
     }
 

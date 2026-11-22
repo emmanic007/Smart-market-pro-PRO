@@ -26,11 +26,19 @@ const Sales = {
   syncFields() {
     const item = DB.data.items.find(i=>i.id===document.getElementById('s-item')?.value);
     if (item) {
+      const sel = document.getElementById('s-format'), wrap = document.getElementById('s-format-wrap');
+      const sig = item.id + '|' + (item.unit||'') + JSON.stringify(item.formats||[]);
+      if (sel && this._fmtSig !== sig) { Formats.fillSelect(sel, item, ''); this._fmtSig = sig; }
+      if (wrap) wrap.style.display = Formats.has(item) ? '' : 'none';
+      const f = Formats.get(item, Formats.has(item) ? sel?.value : '');
       const priceEl = document.getElementById('s-price');
-      if (priceEl) priceEl.value = item.sell;
-      // S'assurer que la quantité est au moins 1
+      if (priceEl) priceEl.value = f.price;
+      // S'assurer que la quantité est positive
       const qtyEl = document.getElementById('s-qty');
-      if (qtyEl && (!qtyEl.value || parseInt(qtyEl.value) <= 0)) qtyEl.value = '1';
+      if (qtyEl && (!qtyEl.value || parseFloat(qtyEl.value) <= 0)) qtyEl.value = '1';
+    } else {
+      const wrap = document.getElementById('s-format-wrap'); if (wrap) wrap.style.display = 'none';
+      this._fmtSig = '';
     }
     this.validate();
   },
@@ -40,7 +48,7 @@ const Sales = {
   },
   validate() {
     const id    = document.getElementById('s-item')?.value;
-    const qty   = Utils.int(document.getElementById('s-qty')?.value) || 0;
+    const count = Utils.num(document.getElementById('s-qty')?.value) || 0;
     const basePrice = Utils.num(document.getElementById('s-price')?.value);
     // Prix réel = prix négocié si champ visible, sinon prix du stock
     const realPriceEl = document.getElementById('s-real-price');
@@ -50,11 +58,15 @@ const Sales = {
     const btn   = document.getElementById('btn-do-sale');
     const warn  = document.getElementById('sale-warning');
     const prev  = document.getElementById('sale-total-preview');
-    const invalid = !item||isNaN(qty)||qty<=0||qty>item.qty||isNaN(price)||price<0;
+    const f   = item ? Formats.get(item, Formats.has(item) ? document.getElementById('s-format')?.value : '') : null;
+    const qty = item ? Formats.r(count * f.n) : 0;
+    const hint = document.getElementById('s-format-hint');
+    if (hint) { hint.style.display = (f && f.id && qty > 0) ? '' : 'none'; if (f && f.id) hint.textContent = '= ' + Formats.qtyText(qty) + ' ' + Formats.baseName(item); }
+    const invalid = !item||isNaN(qty)||qty<=0||qty>item.qty+1e-9||isNaN(price)||price<0;
     if (btn) btn.disabled = invalid;
     if (invalid) { if(warn)warn.style.display='none'; if(prev)prev.innerHTML=''; return; }
-    if (warn) warn.style.display = (Settings.data.warnMargin && price<item.buy) ? 'block' : 'none';
-    const total = price * qty;
+    if (warn) warn.style.display = (Settings.data.warnMargin && price/f.n<item.buy) ? 'block' : 'none';
+    const total = Math.round(price * count * 100) / 100;
     if (prev) prev.innerHTML = `Total : <strong style="color:var(--accent);margin-left:5px">${Utils.currency(total)}</strong>`;
     // Rendu monnaie
     const paidRaw   = document.getElementById('s-paid')?.value;
@@ -88,7 +100,9 @@ const Sales = {
     const item  = DB.data.items.find(i=>i.id===id);
     if (!item)             return UI.toast(I18n.t('toast_err_product_not_found'),'danger');
     if (!Auth.currentUser) return UI.toast(I18n.t('toast_err_auth'),'danger');
-    const qty       = Utils.int(document.getElementById('s-qty')?.value);
+    const count     = Utils.num(document.getElementById('s-qty')?.value);
+    const f         = Formats.get(item, Formats.has(item) ? document.getElementById('s-format')?.value : '');
+    const qty       = Formats.r(count * f.n);
     const basePrice = Utils.num(document.getElementById('s-price')?.value);
     // Prix réel = prix négocié si le champ remise est visible, sinon prix du stock
     const realPriceEl   = document.getElementById('s-real-price');
@@ -98,24 +112,25 @@ const Sales = {
     const discountReason = document.getElementById('s-discount-reason')?.value.trim() || '';
     if (isNaN(qty)||qty<=0)    return UI.toast(I18n.t('toast_err_qty_invalid'),'danger');
     if (isNaN(price)||price<0) return UI.toast(I18n.t('toast_err_price_invalid'),'danger');
-    if (qty>item.qty)          return UI.toast(`${I18n.t('toast_err_stock_low')} (dispo: ${item.qty})`,'danger');
-    if (Settings.data.confirmSale) { if(!await SmpModal.confirm(`${I18n.t('misc_confirm')} ${qty} × ${item.name} = ${Utils.currency(price*qty)} ?`, {title:I18n.t('modal_confirm_sale_title'), icon:'🛒', okLabel:I18n.t('modal_confirm_sale_ok'), okClass:'btn-primary'})) return; }
-    const total    = price * qty;
+    if (qty>item.qty+1e-9)          return UI.toast(`${I18n.t('toast_err_stock_low')} (dispo: ${item.qty})`,'danger');
+    if (Settings.data.confirmSale) { if(!await SmpModal.confirm(`${I18n.t('misc_confirm')} ${Formats.qtyText(count)} × ${f.id?f.name+' ':''}${item.name} = ${Utils.currency(price*count)} ?`, {title:I18n.t('modal_confirm_sale_title'), icon:'🛒', okLabel:I18n.t('modal_confirm_sale_ok'), okClass:'btn-primary'})) return; }
+    const total    = Math.round(price * count * 100) / 100;
     const paidRaw  = document.getElementById('s-paid')?.value;
     const paid     = paidRaw === '' ? total : Utils.num(paidRaw);
     const client   = document.getElementById('s-client')?.value.trim() || '';
     DB.data.sales.push({
       id:Utils.uid(), date:new Date().toISOString(),
-      itemId:item.id, itemName:item.name, qty, price, total,
+      itemId:item.id, itemName:item.name, qty, price: Formats.r(price / f.n), total,
       debt: Math.max(0, total - (isNaN(paid)?total:paid)),
-      profit: (price-item.buy)*qty,
+      profit: Math.round((total - item.buy*qty)*100)/100,
+      ...(f.id ? { fmt: { id:f.id, name:f.name, n:f.n, count:Formats.r(count) } } : {}),
       userId:Auth.currentUser.id, userName:Auth.currentUser.name,
       clientName:client, deleted:false,
-      priceRef: basePrice,
+      priceRef: Formats.r(basePrice / f.n),
       priceModified: priceModified || false,
       discountReason: discountReason || ''
     });
-    item.qty -= qty;
+    item.qty = Formats.r(item.qty - qty);
     // Award loyalty points if client name provided
     if (client && typeof Loyalty !== 'undefined') Loyalty.addPoints(client, total);
     DB.save();
@@ -138,7 +153,7 @@ const Sales = {
     if (!sale||sale.deleted) return;
     if (!await SmpModal.confirm(`${I18n.t('modal_cancel_sale_msg').replace('Le stock','Annuler "'+sale.itemName+'" — '+Utils.currency(sale.total)+' ? Le stock')}`, {title:I18n.t('modal_cancel_sale_title'), icon:'↩️', okLabel:I18n.t('modal_cancel_sale_ok'), okClass:'btn-danger'})) return;
     const item = DB.data.items.find(i=>i.id===sale.itemId);
-    if (item) item.qty += sale.qty;
+    if (item) item.qty = Formats.r(item.qty + sale.qty);
     sale.deleted = true;
     DB.save(); UI.renderAll();
     if (typeof History !== 'undefined') History.render();
@@ -161,7 +176,7 @@ const Sales = {
     if (!await SmpModal.confirm(msg, {title:I18n.t('modal_cancel_sale_title'), icon:'↩️', okLabel:I18n.t('modal_cancel_sale_ok'), okClass:'btn-danger'})) return;
     sales.forEach(sale => {
       const item = DB.data.items.find(i=>i.id===sale.itemId);
-      if (item) item.qty += sale.qty;
+      if (item) item.qty = Formats.r(item.qty + sale.qty);
       sale.deleted = true;
     });
     DB.save(); UI.renderAll();

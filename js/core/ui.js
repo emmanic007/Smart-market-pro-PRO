@@ -65,7 +65,7 @@ const UI = {
         <td class="td-mono">${new Date(s.date).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})}${s.deferred?'<span style="margin-left:4px;font-family:var(--fm);font-size:.55rem;color:var(--warning);background:rgba(255,186,0,.12);padding:1px 4px;border-radius:3px">'+I18n.t('lbl_deferred_badge')+'</span>':''}</td>
         <td><span class="badge badge-gray">${Utils.esc(s.userName)}</span></td>
         <td class="fw-700">${Utils.esc(s.itemName)}</td>
-        <td class="td-mono">${s.qty}</td>
+        <td class="td-mono">${Formats.saleQty(s)}</td>
         <td class="td-mono fw-700">${Utils.currency(s.total)}${s.priceModified ? '<span title="'+(s.discountReason||I18n.t('lbl_price_modified'))+'" style="margin-left:4px;font-size:.6rem;color:'+(s.price<(s.priceRef||s.price)?'var(--warning)':'var(--accent)')+'">('+(s.price<(s.priceRef||s.price)?I18n.t('lbl_discount'):I18n.t('lbl_surplus'))+')</span>' : ''}</td>
         <td>${s.debt>0?`<span class="badge badge-red">${I18n.t('lbl_debt')} ${Utils.currency(s.debt)}</span>`:`<span class="badge badge-green">${I18n.t('lbl_paid_off')}</span>`}</td>
         <td>
@@ -92,7 +92,7 @@ const UI = {
           <td class="td-mono"><span style="font-family:var(--fm);font-size:.58rem;color:var(--text3)">${I18n.t('th_sell')} </span>${Utils.currency(i.sell)}</td>
           <td class="td-mono ${i.sell<i.buy?'text-danger':'text-accent'}">${margin}%</td>
           <td class="td-mono">${i.tva>0?i.tva+'%':'—'}</td>
-          <td class="td-mono"><span style="font-family:var(--fm);font-size:.58rem;color:var(--text3)">${I18n.t('th_stock')} </span><strong>${i.qty}</strong></td>
+          <td class="td-mono"><span style="font-family:var(--fm);font-size:.58rem;color:var(--text3)">${I18n.t('th_stock')} </span><strong>${Formats.has(i) ? Formats.stockLabel(i) : Formats.stockShort(i)}</strong></td>
           <td><span class="badge badge-gray" style="font-size:.58rem">${Utils.esc(i.category||'—')}</span></td>
           <td><span class="badge ${isLow?'badge-red':'badge-green'}">${isLow?'⚠ '+I18n.t('badge_low_stock'):'✓ '+I18n.t('badge_ok_stock')}</span></td>
           <td style="display:flex;gap:4px;flex-wrap:wrap">
@@ -135,7 +135,7 @@ const UI = {
       .sort((a,b) => a.name.localeCompare(b.name, sortLocale, {sensitivity:'base'}));
     sel.innerHTML = avail.length
       ? `<option value="">${I18n.t('def_choose_item')}</option>` +
-        avail.map(i=>`<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${i.qty})</option>`).join('')
+        avail.map(i=>`<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${Formats.stockShort(i)})</option>`).join('')
       : `<option value="">— ${I18n.t('no_stock')} —</option>`;
     if (cur) sel.value = cur;
     // Réinitialiser le champ de recherche si le stock a été rechargé
@@ -153,7 +153,7 @@ const UI = {
     const cur = sel.value;
     sel.innerHTML = filtered.length
       ? `<option value="">— Choisir —</option>` +
-        filtered.map(i=>`<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${i.qty})</option>`).join('')
+        filtered.map(i=>`<option value="${Utils.esc(i.id)}">${Utils.esc(i.name)} (dispo: ${Formats.stockShort(i)})</option>`).join('')
       : `<option value="">— Aucun résultat —</option>`;
     if (cur) sel.value = cur;
   },
