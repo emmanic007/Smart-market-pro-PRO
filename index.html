@@ -831,6 +831,7 @@
       <input type="search" id="stock-search" placeholder="🔍 Rechercher un produit..." data-i18n-placeholder="ph_search_product"
         style="flex:1;min-width:180px;max-width:320px;padding:8px 12px;font-size:.82rem"
         oninput="Stock.filterTable(this.value)">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="StockLog.open()">📜 Mouvements</button>
     </div>
     <div class="table-wrap">
       <table id="tableStock">
@@ -1758,6 +1759,7 @@
 <script src="js/core/i18n.js"></script>
 <script src="js/core/ui.js"></script>
 <script src="js/modules/formats.js"></script>
+<script src="js/modules/stocklog.js"></script>
 <script src="js/modules/transfer.js"></script>
 <script src="js/modules/sales.js"></script>
 <script src="js/modules/stock.js"></script>

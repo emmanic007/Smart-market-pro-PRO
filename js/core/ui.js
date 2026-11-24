@@ -98,6 +98,7 @@ const UI = {
           <td style="display:flex;gap:4px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="Stock.openEdit('${Utils.esc(i.id)}')" ${!Auth.isAdmin()?'disabled':''} title="${I18n.t('btn_edit')}">✏️ ${I18n.t('btn_edit')}</button>
             <button class="btn btn-ghost btn-sm" onclick="Transfer.open('${Utils.esc(i.id)}')" ${!Auth.isAdmin()?'disabled':''} title="Ouvrir / transférer">🔀 Ouvrir</button>
+            <button class="btn btn-ghost btn-sm" onclick="StockLog.open('${Utils.esc(i.id)}')" title="Historique">📜</button>
             <button class="btn btn-danger btn-sm" onclick="Stock.remove('${Utils.esc(i.id)}')" ${!Auth.isAdmin()?'disabled':''}>${I18n.t('btn_delete')}</button>
           </td>
         </tr>`;

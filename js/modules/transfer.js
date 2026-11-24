@@ -77,6 +77,8 @@ const Transfer = {
     r.dest.buy = Formats.r((r.dest.qty * r.dest.buy + cost) / (r.dest.qty + recv));
     r.dest.qty = Formats.r(r.dest.qty + recv);
     r.src.qty  = Formats.r(r.src.qty - r.out);
+    StockLog.add(r.src,'Transfert sortant',-r.out,'vers '+r.dest.name);
+    StockLog.add(r.dest,'Transfert entrant',recv,'depuis '+r.src.name);
     DB.save(); UI.renderAll();
     UI.toast(Formats.qtyText(r.out) + ' ' + Formats.baseName(r.src) + ' ' + r.src.name + ' → ' + Formats.qtyText(recv) + ' ' + Formats.baseName(r.dest) + ' ' + r.dest.name, 'success');
     this.close();

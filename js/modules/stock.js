@@ -26,7 +26,7 @@ const Stock = {
       if(!it.formats.some(f=>f.n===fmtNew.n||f.name.toLowerCase()===packName.toLowerCase())) it.formats.push(fmtNew); };
     const existing = DB.data.items.find(i=>i.name.toLowerCase()===name.toLowerCase()||(code&&i.code&&i.code===code));
     if (existing) {
-      existing.qty=Formats.r(existing.qty+qty); existing.buy=buyU; existing.sell=sellU; existing.min=min;
+      existing.qty=Formats.r(existing.qty+qty); StockLog.add(existing,'Réapprovisionnement',qty,packed?(Formats.qtyText(qty/packN)+' '+packName):''); existing.buy=buyU; existing.sell=sellU; existing.min=min;
       if(unit) existing.unit=unit; addFmt(existing);
       if(code) existing.code=code;
       UI.toast(`${I18n.t('toast_stock_restock')} : +${qty} ${name}`,'success');
@@ -38,7 +38,7 @@ const Stock = {
       const desc = document.getElementById('i-desc')?.value.trim() || '';
       const ni={id:Utils.uid(),name,code:code||'',buy:buyU,sell:sellU,sellWithTVA,tva,qty,min,category,desc,supplierId,createdAt:new Date().toISOString()};
       if(unit) ni.unit=unit; addFmt(ni);
-      DB.data.items.push(ni);
+      DB.data.items.push(ni); StockLog.add(ni,'Création',qty,'');
       UI.toast(`${I18n.t('toast_product_added')} : ${name}`,'success');
     }
     DB.save(); UI.renderAll();
@@ -100,7 +100,9 @@ const Stock = {
     item.sell     = sell;
     item.sellWithTVA = tva > 0 ? sell * (1 + tva/100) : sell;
     item.tva      = tva;
+    const oldQty = item.qty;
     item.qty      = Formats.r(qty);
+    StockLog.add(item,'Correction',Formats.r(qty - oldQty),'');
     item.unit     = document.getElementById('edit-stock-unit')?.value.trim() || '';
     if (!item.unit) delete item.unit;
     item.formats  = fm.formats; if (!item.formats.length) delete item.formats;
@@ -118,6 +120,7 @@ const Stock = {
     const item = DB.data.items.find(i=>i.id===id); if(!item) return;
     const linked = DB.activeSales().filter(s=>s.itemId===id).length;
     if (!await SmpModal.confirm(`${I18n.t('modal_delete_product_irreversible').replace('Cette',`${I18n.t('btn_delete')} "${item.name}"${linked>0?' ('+linked+' '+I18n.t('modal_delete_product_linked')+')':''} — Cette`)}`, {title:I18n.t('modal_delete_product_title'), icon:'🗑️', okLabel:I18n.t('modal_delete_product_ok'), okClass:'btn-danger'})) return;
+    StockLog.add(item,'Suppression',-item.qty,'');
     DB.data.items = DB.data.items.filter(i=>i.id!==id);
     DB.save(); UI.renderAll();
     UI.toast(I18n.t('toast_product_deleted'),'warning');
