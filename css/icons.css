@@ -1,0 +1,4 @@
+.ic{width:1.1em;height:1.1em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;display:inline-block}
+.ic-gold{color:#d4a017}.ic-silver{color:#9aa5b1}.ic-bronze{color:#b87333}
+.ic-dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;vertical-align:.05em;margin-right:.1em}
+.dot-red{background:var(--danger,#ef4444)}.dot-yellow{background:var(--warning,#f59e0b)}.dot-green{background:var(--accent,#22c55e)}
