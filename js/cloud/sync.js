@@ -206,7 +206,8 @@ const Sync = {
   /* ---------- Stock : mouvements (+/-) au lieu d'une quantité écrasée ---------- */
   _applyMove(rec, idx, del) {
     const h = this.store.h, key = 'stock:' + rec.id;
-    if (h[key]) return false;                                         // déjà compté (créé ici, ou déjà reçu)
+    if (h[key]) return false;
+    if (rec.deleted) { h[key] = '1'; return false; }                  // mouvement effacé (remise à zéro de la boutique)                                         // déjà compté (créé ici, ou déjà reçu)
     const d = rec.data || {}, id = String(d.i), delta = Number(d.d) || 0, init = String(rec.id).indexOf('init_') === 0;
     h[key] = '1';
     this._ensureIdx('items', idx, del);
@@ -292,6 +293,42 @@ const Sync = {
       });
       this._save();
     }
+  },
+
+  /* ---------- Remise à zéro du cloud ---------- */
+  // Marque comme supprimés tous les produits, ventes, dépenses, retours, fournisseurs et mouvements de stock de la boutique.
+  // Les autres appareils reçoivent la suppression à leur prochaine synchronisation.
+  async wipeCloud() {
+    if (!this.ready()) return { ok: false, reason: 'noready' };
+    if (!navigator.onLine) return { ok: false, reason: 'offline' };
+    if (CloudAuth.ctx && CloudAuth.ctx.role === 'seller') return { ok: false, reason: 'role' };
+    for (let i = 0; this._running && i < 40; i++) await new Promise(r => setTimeout(r, 250));   // laisse finir une synchro en cours
+    clearTimeout(this._timer); this._running = true;
+    try {
+      const rows = [], PAGE = 1000; let from = 0;
+      for (;;) {
+        const { data, error } = await this.c.from('records').select('kind,id').eq('shop_id', this.shop).eq('deleted', false)
+          .order('kind').order('id').range(from, from + PAGE - 1);
+        if (error) throw error;
+        data.forEach(r => { if (this.ARR.indexOf(r.kind) >= 0 || r.kind === 'stock') rows.push({ k: r.kind + ':' + r.id, row: { shop_id: this.shop, kind: r.kind, id: r.id, data: {}, deleted: true } }); });
+        if (data.length < PAGE) break;
+        from += PAGE;
+      }
+      let bad = 0;
+      for (let i = 0; i < rows.length; i += 200) {
+        const refused = await this._upsertRows(rows.slice(i, i + 200));
+        bad += refused.filter(x => x.k.indexOf('stock:') !== 0).length;      // un mouvement de stock refusé est sans conséquence
+      }
+      if (bad) return { ok: false, reason: 'refused' };
+      const st = this.store;                                                  // l'appareil repart sans mémoire de synchro (sauf les réglages)
+      Object.keys(st.h).forEach(k => { if (k.indexOf('meta:') !== 0) delete st.h[k]; });
+      st.q = {}; st.pend = []; st.orph = {}; st.rej = {};
+      this._save();
+      return { ok: true, n: rows.length };
+    } catch (e) {
+      console.warn('[Sync.wipeCloud]', e);
+      return { ok: false, reason: 'error' };
+    } finally { this._running = false; }
   },
 
   /* ---------- Affichage ---------- */

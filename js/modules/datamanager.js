@@ -70,6 +70,21 @@ const DataManager = {
     'SMP_LAST_BACKUP',
   ],
 
+  // Efface aussi les données dans le cloud (sinon elles reviennent à la reconnexion). true = on peut continuer.
+  async _cloudWipe() {
+    if (typeof Sync === 'undefined' || !Sync.ready()) return true;            // mode local : rien dans le cloud
+    UI.toast(I18n._lang === 'en' ? 'Deleting cloud data…' : 'Suppression des données du cloud…', 'warning');
+    const r = await Sync.wipeCloud();
+    if (r.ok) return true;
+    const fr = {
+      offline: 'Connexion internet requise pour effacer aussi le cloud. Rien n\'a été supprimé.',
+      role: 'Seul le propriétaire peut effacer les données du cloud. Rien n\'a été supprimé.',
+      refused: 'Le serveur a refusé la suppression (abonnement ou droits). Réessaie ; une sauvegarde a été téléchargée.'
+    };
+    UI.toast(fr[r.reason] || 'La suppression du cloud n\'a pas abouti. Réessaie avec une bonne connexion ; une sauvegarde a été téléchargée.', 'danger');
+    return false;
+  },
+
   // ── Hard Reset : efface TOUT, repart à zéro ──
   async resetSystem() {
     if (!Auth.isAdmin()) return UI.toast(I18n.t('toast_err_admin_required'),'danger');
@@ -109,6 +124,9 @@ const DataManager = {
       URL.revokeObjectURL(a.href);
     } catch(_) {}
 
+    // Étape 3b : effacer aussi le cloud (sinon tout revient à la reconnexion)
+    if (!await this._cloudWipe()) return;
+
     // Étape 4 : effacer TOUTES les clés connues + scan complet
     this.ALL_KEYS.forEach(k => localStorage.removeItem(k));
     // Scan de sécurité : supprimer toute clé résiduelle SMP_
@@ -147,6 +165,9 @@ const DataManager = {
       URL.revokeObjectURL(a.href);
     } catch(_) {}
 
+    // Effacer aussi le cloud (sinon les données reviennent à la reconnexion)
+    if (!await this._cloudWipe()) return;
+
     // Effacer uniquement les données commerciales
     DB.data.items     = [];
     DB.data.sales     = [];
@@ -155,6 +176,7 @@ const DataManager = {
     DB.data.loyalty   = {};
     DB.data.suppliers = [];
     DB.data.commissionsPaid = {};
+    DB.data.stockLog  = [];
     DB.data.lastSync  = null;
     DB.save();
 
