@@ -1,7 +1,7 @@
 /* Smart Market Pro — Service Worker (version PRO)
    Si tu ajoutes ou renommes un fichier JS/CSS, mets-le dans APP_SHELL
    ET change CACHE_VERSION pour forcer la mise à jour chez les utilisateurs. */
-const CACHE_VERSION = 'smp-pro-v10';
+const CACHE_VERSION = 'smp-pro-v11';
 const CDN_HOSTS = ['cdn.jsdelivr.net'];            // Chart.js, SheetJS : mémorisés pour le hors ligne
 const APP_SHELL = [
   './',
@@ -40,6 +40,7 @@ const APP_SHELL = [
   './js/modules/datamanager.js',
   './js/modules/sysinfo.js',
   './js/modules/printer.js',
+  './js/modules/aiengine.js',
   './js/modules/aiadvanced.js',
   './js/modules/categories.js',
   './js/modules/suppliers.js',

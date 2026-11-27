@@ -453,10 +453,14 @@ Que souhaitez-vous analyser ?`;
 
     let reply = null;
 
-    // Try real API first if configured
+    // 1) Moteur local : questions courantes, réponse exacte, instantanée, sans internet
+    reply = AIEngine.answer(msg);
+    const engineHit = !!reply;
+
+    // 2) Sinon, vraie IA en ligne si configurée
     try {
       const apiCfg = AIConfig.load();
-      if (apiCfg && apiCfg.provider !== 'local' && apiCfg.apiKey) {
+      if (!reply && apiCfg && apiCfg.provider !== 'local' && apiCfg.apiKey) {
         const systemPrompt = this.buildContext();
         reply = await AIConfig.callAPI(msg, apiCfg.provider, apiCfg.apiKey, systemPrompt, this._history.slice(0,-1));
       }
@@ -468,8 +472,9 @@ Que souhaitez-vous analyser ?`;
       }
     }
 
-    // Fallback to local intelligent analysis
+    // 3) Sinon, ancienne analyse locale
     if (!reply) {
+      AIEngine.logMiss(msg);
       await new Promise(r => setTimeout(r, 500 + Math.random()*300));
       reply = this.localReply(msg);
     }
