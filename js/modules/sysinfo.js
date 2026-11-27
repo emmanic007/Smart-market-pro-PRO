@@ -16,7 +16,7 @@ const SysInfo = {
       }
     }
     const info=[
-      ['Version','Smart Market Pro v7.7'],
+      ['Version','Smart Market Pro v7.8'],
       ['Commerce',Settings.data.shopName||'—'],
       ['Devise',Settings.getCurrency()],
       ['Produits',`${DB.data.items.length} référence(s)`],

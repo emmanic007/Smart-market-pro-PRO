@@ -49,7 +49,7 @@ const Settings = {
     if (authBrand) authBrand.textContent = brand;
     const nb=document.getElementById('nav-brand'); if(nb) nb.textContent=brand;
     const mb=document.getElementById('mob-brand'); if(mb) mb.textContent=short;
-    document.title = brand + ' | v7.7';
+    document.title = brand + ' | v7.8';
   },
   _fillForm() {
     const s=this.data;

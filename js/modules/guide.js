@@ -28,6 +28,8 @@ const Guide = {
         desc: `<ul>
           <li>${t('Sélectionnez l\'article dans la liste — le prix se remplit automatiquement','Select the item from the list — the price fills in automatically')}</li>
           <li>${t('Ajustez la quantité si besoin','Adjust the quantity if needed')}</li>
+          <li>${t('Si le produit a des <strong>formats</strong> (casier, demi-kilo…), choisissez le <strong>Format de vente</strong> : le prix change et la <strong>quantité</strong> = nombre de formats (2 casiers = 2, pas 24)','If the product has <strong>formats</strong> (crate, half-kilo…), pick the <strong>Sale format</strong>: the price changes and the <strong>quantity</strong> = number of formats (2 crates = 2, not 24)')}</li>
+          <li>${t('Une ligne « = 24 bouteille » sous la quantité montre ce qui sort réellement du stock','A line like “= 24 bottle” under the quantity shows what really leaves the stock')}</li>
           <li>${t('Si le client paye une partie : entrez le <strong>Montant Payé</strong> — le reste devient une dette','If the client pays partially: enter the <strong>Amount Paid</strong> — the rest becomes a debt')}</li>
           <li>${t('Le <strong>change</strong> s\'affiche en temps réel quand vous tapez le montant payé','The <strong>change</strong> displays in real time as you type the paid amount')}</li>
           <li>${t('Entrez le <strong>nom du client</strong> pour suivre ses dettes et lui attribuer des points fidélité','Enter the <strong>client name</strong> to track debts and assign loyalty points')}</li>
@@ -45,6 +47,7 @@ const Guide = {
           <li>${t('Touchez un produit pour l\'ajouter · Utilisez <strong>−</strong> et <strong>+</strong> pour la quantité','Tap a product to add it · Use <strong>−</strong> and <strong>+</strong> to adjust quantity')}</li>
           <li>${t('Flash vert de confirmation après chaque vente validée','Green flash confirmation after each validated sale')}</li>
           <li>${t('Le montant à rendre s\'affiche si le client paye plus que le total','Change amount displays if the client pays more than the total')}</li>
+          <li>${t('Un produit avec le signe ▾ ouvre le <strong>choix du format</strong> (bouteille, demi-casier, casier…) avant d\\\'entrer dans le panier','A product with the ▾ sign opens the <strong>format choice</strong> (bottle, half-crate, crate…) before going into the cart')}</li>
         </ul>`
       },
       {
@@ -57,6 +60,8 @@ const Guide = {
           <li>${t('Utilisez la barre de <strong>recherche</strong> en haut pour trouver un produit rapidement','Use the <strong>search</strong> bar at the top to find a product quickly')}</li>
           <li>${t('Sur mobile : chaque produit s\'affiche en carte — lisible sans zoomer','On mobile: each product appears as a card — readable without zooming')}</li>
           <li>${t('Le badge rouge sur l\'onglet Stock indique le nombre de produits en alerte','The red badge on the Stock tab shows the number of products on alert')}</li>
+          <li>${t('Le stock s\\\'affiche avec son unité, et en lots quand le produit a des formats (ex. <strong>37 bouteille ≈ 3 Casier + 1</strong>)','Stock is shown with its unit, and in batches when the product has formats (e.g. <strong>37 bottle ≈ 3 Crate + 1</strong>)')}</li>
+          <li>${t('Le bouton <strong>Mouvements</strong> (ou l\\\'icône d\\\'historique d\\\'un produit) liste ventes, retours, réapprovisionnements, corrections et transferts','The <strong>Movements</strong> button (or a product\\\'s history icon) lists sales, returns, restocking, corrections and transfers')}</li>
         </ul>`
       },
       {
@@ -83,6 +88,7 @@ const Guide = {
           <li>${t('Choisissez la date, le vendeur, ajoutez autant de lignes que nécessaire','Choose the date, seller, add as many lines as needed')}</li>
           <li>${t('Le rendu monnaie est calculé sur chaque ligne','Change is calculated for each line')}</li>
           <li>${t('Les ventes saisies en différé affichent le badge <strong>"DIFFÉRÉ"</strong> dans l\'historique','Deferred sales display the <strong>"DEFERRED"</strong> badge in history')}</li>
+          <li>${t('Pour un produit à formats, choisissez le <strong>format</strong> de la ligne : la quantité compte alors des formats (1,5 casier = 18 bouteilles)','For a product with formats, pick the line\\\'s <strong>format</strong>: the quantity then counts formats (1.5 crates = 18 bottles)')}</li>
         </ul>`
       },
       {
@@ -108,7 +114,21 @@ const Guide = {
           <li>${t('Le <strong>Seuil Alerte</strong> détermine quand l\'alerte stock se déclenche','The <strong>Alert Threshold</strong> determines when the stock alert triggers')}</li>
           <li>${t('Bouton ✏️ sur chaque ligne pour modifier n\'importe quel champ sans supprimer','✏️ button on each row to edit any field without deleting')}</li>
           <li>${t('La <strong>Marge%</strong> et le statut (Ok/Alerte) sont calculés automatiquement','<strong>Margin%</strong> and status (Ok/Alert) are calculated automatically')}</li>
+          <li>${t('Les quantités et les prix acceptent les <strong>virgules</strong> (0,25 kg)','Quantities and prices accept <strong>decimals</strong> (0.25 kg)')}</li>
+          <li>${t('<strong>Chaque modification de stock est notée</strong> dans l\\\'historique (bouton Mouvements)','<strong>Every stock change is recorded</strong> in the history (Movements button)')}</li>
           <li>${t('Rapport Approvisionnement : depuis le menu <strong>"Plus" → Approvisionnement</strong>','Restocking Report: via the <strong>"More" → Restocking</strong> menu')}</li>
+        </ul>`
+      },
+      {
+        role: 'admin',
+        icon: '📦',
+        title: t('Unités & Formats de vente', 'Units & Sale Formats'),
+        desc: `<ul>
+          <li>${t('<strong>Unité de base</strong> : la plus petite unité que vous vendez et comptez en stock (bouteille, kg, pièce). <strong>Prix vente</strong> = prix d\'une unité de base','<strong>Base unit</strong>: the smallest unit you sell and count in stock (bottle, kg, piece). <strong>Sale price</strong> = price of one base unit')}</li>
+          <li>${t('<strong>Acheté par</strong> + <strong>Unités par conditionnement</strong> : si vous achetez par lot. Ex. Coca : « Casier » et 12. La quantité et le prix d\'achat saisis sont alors <strong>par casier</strong> ; l\'app compte en bouteilles (5 casiers = 60 bouteilles)','<strong>Bought by</strong> + <strong>Units per pack</strong>: if you buy in lots. E.g. Coke: “Crate” and 12. The quantity and purchase price entered are then <strong>per crate</strong>; the app counts in bottles (5 crates = 60 bottles)')}</li>
+          <li>${t('<strong>Formats de vente</strong> (bouton ✏️ → section Formats) : nom, nombre d\'unités, prix d\'un format. Ex. Casier 12 → 5 500 F ; Demi-casier 6 → 2 800 F ; Quart de kilo 0,25 → 250 F','<strong>Sale formats</strong> (✏️ button → Formats section): name, number of units, price of one format. E.g. Crate 12 → 5,500; Half-crate 6 → 2,800; Quarter-kilo 0.25 → 250')}</li>
+          <li>${t('<strong>🔀 Ouvrir</strong> : sortez des unités d\'un produit (un casier) pour les ajouter à un autre (Coca à l\'unité). Le coût d\'achat est reporté en moyenne pondérée','<strong>🔀 Open</strong>: take units from one product (a crate) and add them to another (single Coke). The purchase cost is carried over as a weighted average')}</li>
+          <li>${t('Les reçus (impression et WhatsApp) affichent « 2 Casier × 2 400 F »','Receipts (print and WhatsApp) show “2 Crate × 2,400 F”')}</li>
         </ul>`
       },
       {
@@ -192,6 +212,9 @@ const Guide = {
         desc: `<ul>
           <li>${t('Connexion : <strong>IA → Configuration API</strong> → entrez votre clé Gemini, Groq ou Mistral','Setup: <strong>AI → API Configuration</strong> → enter your Gemini, Groq or Mistral key')}</li>
           <li>${t('Sans clé API : mode local avec réponses basées sur vos données réelles','Without API key: local mode with responses based on your real data')}</li>
+          <li>${t('Le <strong>moteur local</strong> répond sans internet, instantanément, avec vos vrais chiffres : bénéfice et ventes (jour, semaine, mois), marge, produit le plus vendu, ce qui s\\\'écoule vite ou ne se vend pas, pertes, capital en jeu, meilleur mois et meilleur jour, dépenses, conseils','The <strong>local engine</strong> answers offline, instantly, with your real figures: profit and sales (day, week, month), margin, best seller, fast/slow movers, losses, capital at stake, best month and day, expenses, advice')}</li>
+          <li>${t('Demandez un prix : <strong>« À combien vendre le Coca ? »</strong> — prix plancher, puis trois propositions (prudent, équilibré, ambitieux)','Ask for a price: <strong>“At what price should I sell Coke?”</strong> — floor price, then three suggestions (cautious, balanced, ambitious)')}</li>
+          <li>${t('Les questions non comprises sont gardées sur l\\\'appareil pour améliorer l\\\'assistant','Questions the assistant did not understand are kept on the device to improve it')}</li>
           <li>${t('Questions possibles : bilan, stock urgent, top vendeurs, dettes, marges, conseils...','Possible questions: overview, urgent stock, top sellers, debts, margins, advice...')}</li>
           <li>${t('L\'IA connaît vos dépenses, retours et bénéfice net réel','The AI knows your expenses, returns and real net profit')}</li>
           <li>${t('La conversation est multi-tour : l\'IA se souvient du contexte dans la session','Multi-turn conversation: the AI remembers context within the session')}</li>
@@ -283,6 +306,7 @@ const Guide = {
           <li>${t('Auto-backup horaire + backup automatique à la fermeture de l\'app','Hourly auto-backup + automatic backup on app close')}</li>
           <li>${t('Import IA : analysez vos anciens fichiers Excel/CSV avec l\'intelligence artificielle','AI Import: analyse your old Excel/CSV files with artificial intelligence')}</li>
           <li>${t('Réinitialisation totale avec création automatique d\'un backup de sécurité','Full reset with automatic creation of a security backup')}</li>
+          <li>${t('La réinitialisation <strong>efface aussi les données du cloud</strong> (internet requis, propriétaire uniquement) : elle est donc visible sur tous les appareils. Une sauvegarde est téléchargée avant','The reset <strong>also erases cloud data</strong> (internet required, owner only): it therefore applies on every device. A backup is downloaded first')}</li>
         </ul>`
       },
       {
@@ -316,8 +340,8 @@ const Guide = {
     // Titre adapté au rôle et à la langue
     const titleEl = modal.querySelector('.guide-title');
     if (titleEl) titleEl.textContent = isAdmin
-      ? t('📖 Guide Administrateur — Smart Market Pro v7.7', '📖 Admin Guide — Smart Market Pro v7.7')
-      : t('📖 Guide Vendeur — Smart Market Pro v7.7',       '📖 Seller Guide — Smart Market Pro v7.7');
+      ? t('📖 Guide Administrateur — Smart Market Pro v7.8', '📖 Admin Guide — Smart Market Pro v7.8')
+      : t('📖 Guide Vendeur — Smart Market Pro v7.8',       '📖 Seller Guide — Smart Market Pro v7.8');
 
     content.innerHTML = steps.map(s => `
       <div class="guide-step">
